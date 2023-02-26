@@ -40,5 +40,5 @@ public abstract class Reponse {
         this.sonde = sonde;
     }
 
-
+    public abstract String getReponse();
 }

@@ -8,7 +8,7 @@ public class ReponseSimple extends Reponse {
        
     }
 
-    public String getValeurReponseSimple(){
+    public String getReponse(){
         return this.valeurReponseSimple;
 
     }

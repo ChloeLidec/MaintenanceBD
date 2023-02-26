@@ -6,5 +6,5 @@ public class ReponsesNote extends Reponse {
 
         
     }
-    public int getNote(){return this.note;}
+    public String getReponse(){return Integer.toString(this.note);}
 }

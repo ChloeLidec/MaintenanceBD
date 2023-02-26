@@ -182,44 +182,36 @@ public class AnalysteJDBC{
 		//get type question
 		ResultSet rsBase = st.executeQuery("Select idT from TYPEQUESTION NATURAL JOIN QUESTION where numQ = " +questionAct.getNumQ());
 		rsBase.next();
-		if (rsBase.getString(1).equals("u")){
+		if (rsBase.getString(1).equals("u") || rsBase.getString(1).equals("l") || rsBase.getString(1).equals("n")){
 			PieChart camembert = new PieChart();
-			HashMap<String,Integer> dico_rep = new HashMap<>();
-			for(Reponse reponse : this.reponsesAct){
-				ReponseSimple repSimple = (ReponseSimple)(reponse);
-				st = laConnexion.createStatement();
-				ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.Valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.valeur = \"" + repSimple.getValeurReponseSimple() + "\" group by REPONDRE.valeur;");
-				//puis creer des slices en for pour chaque reponses avec en valeur l'occurence
-				while(rs.next()){
-					if(!(dico_rep.containsKey(rs.getString(2)))){
-						dico_rep.put(rs.getString(2), rs.getInt(1));
-					}
-				}	
-				
-			}
-			
-			for (String key : dico_rep.keySet()){
-				PieChart.Data slice = new PieChart.Data(key, dico_rep.get(key));
-				slice.setName(key+"->"+slice.getPieValue());
-				camembert.getData().add(slice);
+			//recuperer les reponses a la question actuelle
+			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			while (reponsesQ.next()){
+				PieChart.Data data = new PieChart.Data(reponsesQ.getString(2), reponsesQ.getInt(1));
+				data.setName(reponsesQ.getString(2) + " : " + data.getPieValue());
+				camembert.getData().add(data);
 			}
 			return camembert;
 		}
 		else if (rsBase.getString(1).equals("m")){
 			PieChart camembert = new PieChart();
 			HashMap<String,Integer> dico_rep = new HashMap<>();
-			for(Reponse reponse : this.reponsesAct){
-				ReponseMultiple repMultiple = (ReponseMultiple)(reponse);
-				st = laConnexion.createStatement();
-				ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.Valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.valeur = \"" + repMultiple.getReponses() + "\" group by REPONDRE.valeur;");
-				while(rs.next()){
-					String[] vals = rs.getString(2).split(";");
+			
+				ResultSet reponsesQ = st.executeQuery("Select count(valeur) , valeur from REPONDRE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ() + " group by valeur;");
+				while(reponsesQ.next()){
+					String[] vals = reponsesQ.getString(2).split(";");
 					for(String item :vals){
-						if(!(dico_rep.containsKey(item))){
-							dico_rep.put(item, rs.getInt(1));
+						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + item);
+						rsval.next();
+						String val = rsval.getString(1);
+						if(!(dico_rep.containsKey(val))){
+							dico_rep.put(val, reponsesQ.getInt(1));
+						}
+						else{
+							dico_rep.put(val, dico_rep.get(val)+reponsesQ.getInt(1));
 						}
 					}
-				}
+				
 			}
 			for (String key : dico_rep.keySet()){
 				PieChart.Data slice = new PieChart.Data(key, dico_rep.get(key));
@@ -229,55 +221,11 @@ public class AnalysteJDBC{
 			return camembert;
 
 		}
-		else if (rsBase.getString(1).equals("c")){
+		else{
 			System.out.println("Représentation indisponible pour les réponses de type 'classement'");
 			
 		} 
-		else if (rsBase.getString(1).equals("n")){
-			PieChart camembert = new PieChart();
-			HashMap<String,Integer> dico_rep = new HashMap<>();
-			for(Reponse reponse : this.reponsesAct){
-				ReponsesNote rep = (ReponsesNote)(reponse);
-				st = laConnexion.createStatement();
-				ResultSet rs = st.executeQuery("Select count(valeur) , valeur from REPONDRE where valeur = \"" + rep.getNote() + "\" group by valeur;");
-				while(rs.next()){
-					if(!(dico_rep.containsKey(rs.getString(2)))){
-						dico_rep.put(rs.getString(2), rs.getInt(1));
-					}
-				}	
-				
-			}
-			
-			for (String key : dico_rep.keySet()){
-				PieChart.Data slice = new PieChart.Data(key, dico_rep.get(key));
-				slice.setName(key+"->"+slice.getPieValue());
-				camembert.getData().add(slice);
-			}
-			return camembert;
-			}
-
-		else {
-			PieChart camembert = new PieChart();
-			HashMap<String,Integer> dico_rep = new HashMap<>();
-			for(Reponse reponse : this.reponsesAct){
-				ReponseSimple repSimple = (ReponseSimple)(reponse);
-				st = laConnexion.createStatement();
-				ResultSet rs = st.executeQuery("Select count(valeur),valeur from REPONDRE where valeur = \"" + repSimple.getValeurReponseSimple() + "\" group by valeur;");
-				//puis creer des slices en for pour chaque reponses avec en valeur l'occurence
-				while(rs.next()){
-					if(!(dico_rep.containsKey(rs.getString(2)))){
-						dico_rep.put(rs.getString(2), rs.getInt(1));
-					}
-				}
-			}
-
-			for (String key : dico_rep.keySet()){
-				PieChart.Data slice = new PieChart.Data(key, dico_rep.get(key));
-				slice.setName(key+"->"+slice.getPieValue());
-				camembert.getData().add(slice);
-			}
-			return camembert;
-		}
+		
 		return new PieChart(); 
 	}
 	/**
@@ -303,7 +251,7 @@ public class AnalysteJDBC{
 			for(Reponse reponse : this.reponsesAct){
 				ReponseClassement repClassement = (ReponseClassement)(reponse);
 				st = laConnexion.createStatement();
-				ResultSet rs = st.executeQuery("Select REPONDRE.Valeur,MaxVal from QUESTION NATURAL JOIN REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.valeur = \""+repClassement.getReponseClassement()+"\"");
+				ResultSet rs = st.executeQuery("Select REPONDRE.Valeur,MaxVal from QUESTION NATURAL JOIN REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.valeur = \""+repClassement.getReponse()+"\"");
 				while(rs.next()){
 					max = rs.getInt(2);
 					String[] vals= rs.getString(1).split(";");

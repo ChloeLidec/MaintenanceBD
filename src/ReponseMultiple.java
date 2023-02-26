@@ -8,7 +8,7 @@ public class ReponseMultiple extends Reponse {
         this.reponses=val;
 
     }
-    public String getReponses(){
+    public String getReponse(){
         return this.reponses;
     }
     

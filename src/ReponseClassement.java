@@ -7,7 +7,7 @@ public class ReponseClassement extends Reponse {
         this.valeurReponseClassement =  valeurReponseClassement;
     }
 
-    public String getReponseClassement(){
+    public String getReponse(){
         return this.valeurReponseClassement;
     }
 
