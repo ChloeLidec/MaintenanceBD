@@ -2,6 +2,7 @@ import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import javafx.scene.chart.BarChart;
@@ -197,9 +198,9 @@ public class AnalysteJDBC{
 			PieChart camembert = new PieChart();
 			HashMap<String,Integer> dico_rep = new HashMap<>();
 			
-				ResultSet reponsesQ = st.executeQuery("Select count(valeur) , valeur from REPONDRE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ() + " group by valeur;");
+				ResultSet reponsesQ = st.executeQuery("Select valeur from REPONDRE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ() + ";");
 				while(reponsesQ.next()){
-					String[] vals = reponsesQ.getString(2).split(";");
+					String[] vals = reponsesQ.getString(1).split(";");
 					for(String item :vals){
 						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + item);
 						rsval.next();
@@ -234,10 +235,6 @@ public class AnalysteJDBC{
 	 * @throws SQLException
 	 */
 	public BarChart<String,Number> getHisto() throws SQLException{
-		HashMap<String,Integer> dico_rep1 = new HashMap<>();
-		HashMap<String,Integer> dico_rep2 = new HashMap<>();
-		HashMap<String,Integer> dico_rep3 = new HashMap<>();
-		int max =0;
 		st = laConnexion.createStatement();
 		ResultSet rsBase = st.executeQuery("Select idT  from TYPEQUESTION NATURAL JOIN QUESTION where numQ = " +questionAct.getNumQ());
 		CategoryAxis xAxis = new CategoryAxis();
@@ -246,74 +243,41 @@ public class AnalysteJDBC{
 		yAxis.setLabel("Percent");
 		BarChart<String, Number> battons = new BarChart<String, Number>(xAxis,yAxis);	
 		rsBase.next();
-		List<String> noms=new ArrayList<>();
+		//dic of string float
+		HashMap<String,Float> dico_rep = new HashMap<>();
 		if (rsBase.getString(1).equals("c")){
-			for(Reponse reponse : this.reponsesAct){
-				ReponseClassement repClassement = (ReponseClassement)(reponse);
 				st = laConnexion.createStatement();
-				ResultSet rs = st.executeQuery("Select REPONDRE.Valeur,MaxVal from QUESTION NATURAL JOIN REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.valeur = \""+repClassement.getReponse()+"\"");
+				ResultSet valPoss = st.executeQuery("Select valeur from VALPOSSIBLE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
+				while(valPoss.next()){
+					dico_rep.put(valPoss.getString(1), 0f);
+				}
+				ResultSet rs = st.executeQuery("Select valeur from REPONDRE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
+				//je met en place un systeme de points 1ere place =1 2e=0.5 3e=0.25
 				while(rs.next()){
-					max = rs.getInt(2);
-					String[] vals= rs.getString(1).split(";");
-					int i=1;
-					for (String val :vals){
-						ResultSet rsV = st.executeQuery("Select Valeur from VALPOSSIBLE where idV ="+val);
-						rsV.next();
-						String nv= rsV.getString(1);
-						if (! noms.contains(nv)){noms.add(nv);}
-						if(i==1 ){
-								if(!(dico_rep1.containsKey(nv))){
-									dico_rep1.put(nv,1);
-									}
-								else{dico_rep1.put(nv,dico_rep1.get(nv)+1);}
+					String[] vals = rs.getString(1).split(";");
+					for(int i=0;i<vals.length;i++){
+						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
+						rsval.next();
+						String val = rsval.getString(1);
+						if(i==0){
+							dico_rep.put(val, dico_rep.get(val)+1f);
 						}
-						if(i==2 ){
-
-							if(!(dico_rep2.containsKey(nv))){
-								dico_rep2.put(nv,1);
-								}
-							else{dico_rep2.put(nv,dico_rep2.get(nv)+1);}
+						else if(i==1){
+							dico_rep.put(val, dico_rep.get(val)+0.5f);
 						}
-
-						if(i==3 ){
-							
-							if(!(dico_rep3.containsKey(nv))){
-								dico_rep3.put(nv,1);
-								}
-							else{dico_rep3.put(nv,dico_rep3.get(nv)+1);}
-							}
+						else if(i==2){
+							dico_rep.put(val, dico_rep.get(val)+0.25f);
 						}
-						i++;
-					
+					}	
 				} 
+				for (String key : dico_rep.keySet()){
+					XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+					series.setName(key);
+					series.getData().add(new XYChart.Data<String, Number>(key, dico_rep.get(key)));
+					battons.getData().add(series);
+				}
 				
-					
-				}
-				XYChart.Series<String,Number> dataSeries1 = new XYChart.Series<>();
-				dataSeries1.setName("premier");
-				XYChart.Series<String,Number> dataSeries2 = new XYChart.Series<>();
-				dataSeries2.setName("deuxième");
-				XYChart.Series<String,Number> dataSeries3 = new XYChart.Series<>();
-				dataSeries3.setName("troisième");
-				for (int ind=0;ind<max;ind++){
-					String nom = noms.get(ind);
-					if(! dico_rep1.keySet().contains(nom)){
-						dataSeries1.getData().add(new XYChart.Data<String,Number>(nom,0));
-					}
-					else{dataSeries1.getData().add(new XYChart.Data<String,Number>(nom,dico_rep1.get(nom)));}
-					if(! dico_rep2.keySet().contains(nom)){
-						dataSeries2.getData().add(new XYChart.Data<String,Number>(nom,0));
-					}
-					else{dataSeries2.getData().add(new XYChart.Data<String,Number>(nom,dico_rep2.get(nom)));}
-					if(! dico_rep3.keySet().contains(nom)){
-						dataSeries3.getData().add(new XYChart.Data<String,Number>(nom,0));
-					}
-					else{dataSeries3.getData().add(new XYChart.Data<String,Number>(nom,dico_rep3.get(nom)));}
-					
-				battons.getData().addAll(dataSeries1,dataSeries2,dataSeries3);
-				battons.setBarGap(5);
-				}
-			
+				
 		}
 		return battons;
 		
