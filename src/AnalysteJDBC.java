@@ -301,7 +301,6 @@ public class AnalysteJDBC{
 				listeCouleurs.add("#"+Integer.toHexString((int)(Math.random()*16777215)));
 			}
 			while (reponsesQ.next()){
-				System.out.println(reponsesQ.getInt(3)+""+reponsesQ.getInt(4)+reponsesQ.getInt(5));
 				if (i == -1){
 					i = reponsesQ.getInt(3);
 				}
@@ -309,7 +308,6 @@ public class AnalysteJDBC{
 					PieChart.Data data = new PieChart.Data(reponsesQ.getInt(4)+"-"+reponsesQ.getInt(5)+ reponsesQ.getString(2), reponsesQ.getInt(1));
 					data.setName(reponsesQ.getInt(4)+"-"+reponsesQ.getInt(5)+ reponsesQ.getString(2) + " : " + data.getPieValue());
 					camembert.getData().add(data);
-					//set color
 					data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
 					i = reponsesQ.getInt(3);
 				}
