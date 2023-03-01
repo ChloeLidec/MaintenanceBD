@@ -77,7 +77,7 @@ insert into QUESTION(idQ,numQ,texteQ,MaxVal,idT) values
 (5,9,'Parmi ces couleurs classez en trois pour repeindre la façade de la mairie.',3,'c'),
 (5,10,'Quelle est votre couleur préférée?',NULL,'l');
 
--- les valeurs possibles pour les réponses à choix multiples ou classement du questionnaires 1
+-- les valeurs possibles pour les réponses à choix multiples ou classement  ou unique du questionnaires 1
 insert into VALPOSSIBLE(idQ, numQ, idV, Valeur) values
 (1,1,1,'Bleu'),
 (1,1,2,'Vert'),

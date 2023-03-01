@@ -3,6 +3,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import javafx.scene.chart.BarChart;
@@ -183,10 +186,21 @@ public class AnalysteJDBC{
 		//get type question
 		ResultSet rsBase = st.executeQuery("Select idT from TYPEQUESTION NATURAL JOIN QUESTION where numQ = " +questionAct.getNumQ());
 		rsBase.next();
-		if (rsBase.getString(1).equals("u") || rsBase.getString(1).equals("l") || rsBase.getString(1).equals("n")){
+		if (rsBase.getString(1).equals("u") ){
 			PieChart camembert = new PieChart();
 			//recuperer les reponses a la question actuelle
-			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			while (reponsesQ.next()){
+				PieChart.Data data = new PieChart.Data(reponsesQ.getString(2), reponsesQ.getInt(1));
+				data.setName(reponsesQ.getString(2) + " : " + data.getPieValue());
+				camembert.getData().add(data);
+			}
+			return camembert;
+		}
+		else if (rsBase.getString(1).equals("l") || rsBase.getString(1).equals("n")){
+			PieChart camembert = new PieChart();
+			//recuperer les reponses a la question actuelle
+			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur from REPONDRE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
 			while (reponsesQ.next()){
 				PieChart.Data data = new PieChart.Data(reponsesQ.getString(2), reponsesQ.getInt(1));
 				data.setName(reponsesQ.getString(2) + " : " + data.getPieValue());
@@ -222,12 +236,40 @@ public class AnalysteJDBC{
 			return camembert;
 
 		}
-		else{
-			System.out.println("Représentation indisponible pour les réponses de type 'classement'");
-			
+		else if (rsBase.getString(1).equals("c")){
+			HashMap<String,Float> dico_rep = new HashMap<>();
+			ResultSet valPoss = st.executeQuery("Select valeur from VALPOSSIBLE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
+				while(valPoss.next()){
+					dico_rep.put(valPoss.getString(1), 0f);
+				}
+				ResultSet rs = st.executeQuery("Select valeur from REPONDRE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
+				//je met en place un systeme de points 1ere place =1 2e=0.5 3e=0.25
+				while(rs.next()){
+					String[] vals = rs.getString(1).split(";");
+					for(int i=0;i<vals.length;i++){
+						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
+						rsval.next();
+						String val = rsval.getString(1);
+						if(i==0){
+							dico_rep.put(val, dico_rep.get(val)+1f);
+						}
+						else if(i==1){
+							dico_rep.put(val, dico_rep.get(val)+0.5f);
+						}
+						else if(i==2){
+							dico_rep.put(val, dico_rep.get(val)+0.25f);
+						}
+					}	
+				} 
+				PieChart camembert = new PieChart();
+				for (String key : dico_rep.keySet()){
+					PieChart.Data slice = new PieChart.Data(key, dico_rep.get(key));
+					slice.setName(key+"->"+slice.getPieValue());
+					camembert.getData().add(slice);
+				}
+				return camembert;
 		} 
-		
-		return new PieChart(); 
+		return null;
 	}
 	/**
 	 * get histogramme(classement) mais on a pas réussi à ajouter les données comme on le voulait
@@ -246,7 +288,6 @@ public class AnalysteJDBC{
 		//dic of string float
 		HashMap<String,Float> dico_rep = new HashMap<>();
 		if (rsBase.getString(1).equals("c")){
-				st = laConnexion.createStatement();
 				ResultSet valPoss = st.executeQuery("Select valeur from VALPOSSIBLE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
 				while(valPoss.next()){
 					dico_rep.put(valPoss.getString(1), 0f);
@@ -275,11 +316,81 @@ public class AnalysteJDBC{
 					series.setName(key);
 					series.getData().add(new XYChart.Data<String, Number>(key, dico_rep.get(key)));
 					battons.getData().add(series);
-				}
-				
-				
+				}		
+				Collections.sort(battons.getData(), new Comparator<XYChart.Series<String, Number>>() {
+					@Override
+					public int compare(XYChart.Series<String, Number> o1, XYChart.Series<String, Number> o2) {
+						return o1.getData().get(0).getYValue().intValue() - o2.getData().get(0).getYValue().intValue();
+					}
+				});
+				return battons;
 		}
-		return battons;
+		else if (rsBase.getString(1).equals("u")){
+			ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			while(rs.next()){
+				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+				series.setName(rs.getString(2));
+				series.getData().add(new XYChart.Data<String, Number>(rs.getString(2), rs.getInt(1)));
+				battons.getData().add(series);
+			}
+			Collections.sort(battons.getData(), new Comparator<XYChart.Series<String, Number>>() {
+				@Override
+				public int compare(XYChart.Series<String, Number> o1, XYChart.Series<String, Number> o2) {
+					return o1.getData().get(0).getYValue().intValue() - o2.getData().get(0).getYValue().intValue();
+				}
+			});
+			return battons;
+		}
+		else if (rsBase.getString(1).equals("n") || rsBase.getString(1).equals("l")){
+			ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur from REPONDRE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			while(rs.next()){
+				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+				series.setName(rs.getString(2));
+				series.getData().add(new XYChart.Data<String, Number>(rs.getString(2), rs.getInt(1)));
+				battons.getData().add(series);
+			}
+			if (rsBase.getString(1).equals("n")){
+				Collections.sort(battons.getData(), new Comparator<XYChart.Series<String, Number>>() {
+					@Override
+					public int compare(XYChart.Series<String, Number> o1, XYChart.Series<String, Number> o2) {
+						//compare int of string
+						return Integer.parseInt(o1.getName()) - Integer.parseInt(o2.getName());
+					}
+				});
+			}
+			return battons;
+		}
+		else if (rsBase.getString(1).equals("m")){
+			ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			while(rs.next()){
+				String[] vals = rs.getString(2).split(";");
+				for(String item :vals){
+					ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + item);
+					rsval.next();
+					String val = rsval.getString(1);
+					if(!(dico_rep.containsKey(val))){
+						dico_rep.put(val, (float) rs.getInt(1));
+					}
+					else{
+						dico_rep.put(val, dico_rep.get(val)+(float)rs.getInt(1));
+					}
+				}
+			}
+			for (String key : dico_rep.keySet()){
+				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+				series.setName(key);
+				series.getData().add(new XYChart.Data<String, Number>(key, dico_rep.get(key)));
+				battons.getData().add(series);
+			}
+			Collections.sort(battons.getData(), new Comparator<XYChart.Series<String, Number>>() {
+				@Override
+				public int compare(XYChart.Series<String, Number> o1, XYChart.Series<String, Number> o2) {
+					return o1.getData().get(0).getYValue().intValue() - o2.getData().get(0).getYValue().intValue();
+				}
+			});
+			return battons;
+		}
+		return null;
 		
 	}
 	/**
