@@ -2,8 +2,6 @@ import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,6 +11,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
 
 
 public class AnalysteJDBC{
@@ -95,6 +94,22 @@ public class AnalysteJDBC{
 	public void questionPrec(){
 		if(!this.premiereQuestion()){
 		this.questionAct= this.sondageAct.getQuestion(this.sondageAct.getQuestions().indexOf(this.questionAct)-1);}
+	}
+
+	public void allerAQ(int id){
+		try{
+			id = this.sondageAct.getQuestions().get(id-1).getNumQ();
+			this.questionAct = this.getQuestion(id);
+		}
+		catch(Exception e){
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setTitle("Nombre de question invalide");
+			alert.setHeaderText("Le nombre de question est invalide");
+			alert.setContentText("Le nombre de question doit être compris entre 1 et " + this.sondageAct.getQuestions().size());
+			alert.getDialogPane().setMinHeight(200);
+			alert.showAndWait();
+		}
+		
 	}
 	/**
 	 * verifie si c'est la dernière question
@@ -201,6 +216,110 @@ public class AnalysteJDBC{
 			PieChart camembert = new PieChart();
 			//recuperer les reponses a la question actuelle
 			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur from REPONDRE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			while (reponsesQ.next()){
+				PieChart.Data data = new PieChart.Data(reponsesQ.getString(2), reponsesQ.getInt(1));
+				data.setName(reponsesQ.getString(2) + " : " + data.getPieValue());
+				camembert.getData().add(data);
+			}
+			return camembert;
+		}
+		else if (rsBase.getString(1).equals("m")){
+			PieChart camembert = new PieChart();
+			HashMap<String,Integer> dico_rep = new HashMap<>();
+			
+				ResultSet reponsesQ = st.executeQuery("Select valeur from REPONDRE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ() + ";");
+				while(reponsesQ.next()){
+					String[] vals = reponsesQ.getString(1).split(";");
+					for(String item :vals){
+						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + item);
+						rsval.next();
+						String val = rsval.getString(1);
+						if(!(dico_rep.containsKey(val))){
+							dico_rep.put(val, reponsesQ.getInt(1));
+						}
+						else{
+							dico_rep.put(val, dico_rep.get(val)+reponsesQ.getInt(1));
+						}
+					}
+				
+			}
+			for (String key : dico_rep.keySet()){
+				PieChart.Data slice = new PieChart.Data(key, dico_rep.get(key));
+				slice.setName(key+"->"+slice.getPieValue());
+				camembert.getData().add(slice);
+			}
+			return camembert;
+
+		}
+		else if (rsBase.getString(1).equals("c")){
+			HashMap<String,Float> dico_rep = new HashMap<>();
+			ResultSet valPoss = st.executeQuery("Select valeur from VALPOSSIBLE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
+				while(valPoss.next()){
+					dico_rep.put(valPoss.getString(1), 0f);
+				}
+				ResultSet rs = st.executeQuery("Select valeur from REPONDRE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
+				//je met en place un systeme de points 1ere place =1 2e=0.5 3e=0.25
+				while(rs.next()){
+					String[] vals = rs.getString(1).split(";");
+					for(int i=0;i<vals.length;i++){
+						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
+						rsval.next();
+						String val = rsval.getString(1);
+						if(i==0){
+							dico_rep.put(val, dico_rep.get(val)+1f);
+						}
+						else if(i==1){
+							dico_rep.put(val, dico_rep.get(val)+0.5f);
+						}
+						else if(i==2){
+							dico_rep.put(val, dico_rep.get(val)+0.25f);
+						}
+					}	
+				} 
+				PieChart camembert = new PieChart();
+				for (String key : dico_rep.keySet()){
+					PieChart.Data slice = new PieChart.Data(key, dico_rep.get(key));
+					slice.setName(key+"->"+slice.getPieValue());
+					camembert.getData().add(slice);
+				}
+				return camembert;
+		} 
+		return null;
+	}
+
+	public PieChart getPieTri(String typeTri) throws SQLException{
+		st = laConnexion.createStatement();
+		ResultSet rsBase = st.executeQuery("Select idT from TYPEQUESTION NATURAL JOIN QUESTION where numQ = " +questionAct.getNumQ());
+		rsBase.next();
+		if (rsBase.getString(1).equals("u") ){
+			PieChart camembert = new PieChart();
+			//recuperer les reponses a la question actuelle
+			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur,idTr,valDebut,valFin from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idTr;");
+			int i = -1;
+			List<String> listeCouleurs = new ArrayList<String>();
+			for (int j = 0; j < 10; j++){
+				listeCouleurs.add("#"+Integer.toHexString((int)(Math.random()*16777215)));
+			}
+			while (reponsesQ.next()){
+				System.out.println(reponsesQ.getInt(3)+""+reponsesQ.getInt(4)+reponsesQ.getInt(5));
+				if (i == -1){
+					i = reponsesQ.getInt(3);
+				}
+				while (i != reponsesQ.getInt(3)){
+					PieChart.Data data = new PieChart.Data(reponsesQ.getInt(4)+"-"+reponsesQ.getInt(5)+ reponsesQ.getString(2), reponsesQ.getInt(1));
+					data.setName(reponsesQ.getInt(4)+"-"+reponsesQ.getInt(5)+ reponsesQ.getString(2) + " : " + data.getPieValue());
+					camembert.getData().add(data);
+					//set color
+					data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
+					i = reponsesQ.getInt(3);
+				}
+			}
+			return camembert;
+		}
+		else if (rsBase.getString(1).equals("l") || rsBase.getString(1).equals("n")){
+			PieChart camembert = new PieChart();
+			//recuperer les reponses a la question actuelle
+			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur from REPONDRE  where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
 			while (reponsesQ.next()){
 				PieChart.Data data = new PieChart.Data(reponsesQ.getString(2), reponsesQ.getInt(1));
 				data.setName(reponsesQ.getString(2) + " : " + data.getPieValue());

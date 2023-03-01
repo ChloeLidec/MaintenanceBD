@@ -35,6 +35,7 @@ public class FenetreAnalyste extends BorderPane {
     private Button acceuil;
     private AnalysteJDBC ana;
     private AppliAllo45 app;
+    private String typeGraphe;
         public FenetreAnalyste(Button prec,Button suiv,Button ac,Button decoB,AnalysteJDBC ana,AppliAllo45 app){
             super();
             this.bsuiv=suiv;
@@ -49,6 +50,7 @@ public class FenetreAnalyste extends BorderPane {
             this.bottom();
             this.setCenter(new ImageView("logo.png"));
         }
+
         //haut = menu et logo et deconnexion
         public BorderPane top(){
             BorderPane top = new BorderPane();
@@ -109,18 +111,23 @@ public class FenetreAnalyste extends BorderPane {
             ques.setWrappingWidth(200);
             center.getChildren().addAll(new Text("Question "+this.ana.gQuestion().getNumQ()),ques);
             if(q.getType().equals("u")){          
+                this.typeGraphe="Bar";
                 center.getChildren().add(this.ana.getHisto());
             }
-            else if(q.getType().equals("n")){
+            else if(q.getType().equals("n")){   
+                this.typeGraphe="Bar";
                 center.getChildren().add(this.ana.getHisto());
             } 
-            else if(q.getType().equals("l")){
+            else if(q.getType().equals("l")){   
+                this.typeGraphe="Bar";
                 center.getChildren().add(this.ana.getHisto());
             }
-            else if(q.getType().equals("c")){
+            else if(q.getType().equals("c")){   
+                this.typeGraphe="Pie";
                 center.getChildren().add(this.ana.getPie());
             }
-            else{
+            else{   
+                this.typeGraphe="Bar";
                 center.getChildren().add(this.ana.getHisto());
             }
      
@@ -146,7 +153,9 @@ public class FenetreAnalyste extends BorderPane {
             Text tTriSocio = new Text("Tri par catégorie \n      socio-pro");
             tTriSocio.setFont(Font.font("verdana", null, FontPosture.REGULAR, 13));
             Button aller = new Button("",tAller);
+            aller.setOnAction(new ControlleurAllerQ(app,null,this.ana,numAllerA));
             Button triParAge = new Button("",tTriParAge);
+            triParAge.setOnAction(new ControlleurTriAge(this,"Age"));
             Button triSocio = new Button("",tTriSocio);
             aller.setPrefSize(140,40);
             triParAge.setPrefSize(140,40);
@@ -217,6 +226,11 @@ public class FenetreAnalyste extends BorderPane {
         }
         /**reload graphe au milieu*/
         public void changerGraphe(String type) {
+            VBox center = new VBox();
+            center.setAlignment(Pos.CENTER);
+            Text ques =new Text(this.ana.gQuestion().getTexte());
+            ques.setWrappingWidth(200);
+            center.getChildren().addAll(new Text("Question "+this.ana.gQuestion().getNumQ()),ques);
             if (type.equals("Bar")) {
                 BarChart bar = null;
                 try {
@@ -228,7 +242,8 @@ public class FenetreAnalyste extends BorderPane {
                     Alert a = new Alert(Alert.AlertType.INFORMATION,"Représentation impossible");
                     a.showAndWait();
                 } else {
-                    this.setCenter(bar);
+                    this.typeGraphe = "Bar";
+                    center.getChildren().add(bar);
                 }
             } else if (type.equals("Pie")) {
                 PieChart pie = null;
@@ -241,10 +256,30 @@ public class FenetreAnalyste extends BorderPane {
                     Alert a = new Alert(Alert.AlertType.INFORMATION,"Représentation impossible");
                     a.showAndWait();
                 } else {
+                    this.typeGraphe = "Pie";
+                    center.getChildren().add(pie);
+                }
+            } 
+            this.setCenter(center);
+            }
+
+        public void changerGrapheTri(String type, String tri){
+            if (type == "Pie" && tri == "Age") {
+                PieChart pie = null;
+                try {
+                    pie = this.ana.getPieTri(tri);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                if (pie == null) {
+                    Alert a = new Alert(Alert.AlertType.INFORMATION,"Représentation impossible");
+                    a.showAndWait();
+                } else {
+                    this.typeGraphe = "Pie";
                     this.setCenter(pie);
                 }
             } 
-            }
+        }
         }
        
    
