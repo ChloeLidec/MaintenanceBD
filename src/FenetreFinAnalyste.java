@@ -9,6 +9,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+
+import java.sql.SQLException;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -26,8 +29,16 @@ public class FenetreFinAnalyste  extends BorderPane {
         this.ana=ana;
         this.ba=ba;
         this.nomEnt = new Label("Nom entreprise");
-        this.textent1 = new Label("Intérogés "+this.ana.getSondage().getPanel().getListSonde().size());
-        this.textent2 =new Label("Réponses complètes "+this.ana.getSondage().getPanel().getListSonde().size());
+        try {
+            this.textent1 = new Label("Intérogés "+this.ana.getInterroges());
+        } catch (SQLException e) {
+            this.textent1 = new Label("Nombre d'intérogés introuvable");
+        }
+        try {
+            this.textent2 =new Label("Réponses complètes "+this.ana.getReponsesComplettes());
+        } catch (SQLException e) {
+            this.textent2 =new Label("Nombre de réponses complètes introuvable");
+        }
         this.setStyle(" -fx-base: #ebebeb;");
         this.setTop(this.top());
         this.setCenter(this.gridPane());
