@@ -155,8 +155,9 @@ public class FenetreAnalyste extends BorderPane {
             Button aller = new Button("",tAller);
             aller.setOnAction(new ControlleurAllerQ(app,null,this.ana,numAllerA));
             Button triParAge = new Button("",tTriParAge);
-            triParAge.setOnAction(new ControlleurTriAge(this,"Age"));
+            triParAge.setOnAction(new ControlleurTri(this,"Age"));
             Button triSocio = new Button("",tTriSocio);
+            triSocio.setOnAction(new ControlleurTri(this,"Socio"));
             aller.setPrefSize(140,40);
             triParAge.setPrefSize(140,40);
             triSocio.setPrefSize(140,40);
@@ -264,7 +265,7 @@ public class FenetreAnalyste extends BorderPane {
             }
 
         public void changerGrapheTri(String type, String tri){
-            if (type == "Pie" && tri == "Age") {
+            if (type == "Pie") {
                 PieChart pie = null;
                 try {
                     pie = this.ana.getPieTri(tri);
@@ -279,7 +280,7 @@ public class FenetreAnalyste extends BorderPane {
                     this.setCenter(pie);
                 }
             } 
-            else if (type =="Bar" && tri == "Age") {
+            else if (type =="Bar") {
                 BarChart bar = null;
                 try {
                     bar = this.ana.getHistoTri(tri);
@@ -294,36 +295,7 @@ public class FenetreAnalyste extends BorderPane {
                     this.setCenter(bar);
                 }
             }
-            else if (type == "Pie" && tri == "Socio") {
-                PieChart pie = null;
-                try {
-                    pie = this.ana.getPieTri(tri);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                if (pie == null) {
-                    Alert a = new Alert(Alert.AlertType.INFORMATION,"Représentation impossible");
-                    a.showAndWait();
-                } else {
-                    this.typeGraphe = "Pie";
-                    this.setCenter(pie);
-                }
-            } 
-            else if (type =="Bar" && tri == "Socio") {
-                BarChart bar = null;
-                try {
-                    bar = this.ana.getHistoTri(tri);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                if (bar == null) {
-                    Alert a = new Alert(Alert.AlertType.INFORMATION,"Représentation impossible");
-                    a.showAndWait();
-                } else {
-                    this.typeGraphe = "Bar";
-                    this.setCenter(bar);
-                }
-            }
+            
         }
         }
        

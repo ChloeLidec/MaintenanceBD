@@ -1,10 +1,10 @@
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-public class ControlleurTriAge implements EventHandler<ActionEvent>{
+public class ControlleurTri implements EventHandler<ActionEvent>{
     private FenetreAnalyste vue;
     private String type;
 
-    public ControlleurTriAge(FenetreAnalyste vue, String type){
+    public ControlleurTri(FenetreAnalyste vue, String type){
         this.vue=vue;
         this.type=type;
     }
@@ -12,6 +12,6 @@ public class ControlleurTriAge implements EventHandler<ActionEvent>{
     @Override
     public void handle(ActionEvent actionEvent) {
         String chart = this.vue.typeGraphe;
-        this.vue.changerGrapheTri(chart, "Age");
+        this.vue.changerGrapheTri(chart,this.type);
     }
 }
