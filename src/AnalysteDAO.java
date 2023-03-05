@@ -914,5 +914,39 @@ public class AnalysteDAO{
 		rs.next();
 		return rs.getInt(1);
 	}
+
+	public String getEntreprise() throws SQLException {
+		st = laConnexion.createStatement();
+		ResultSet rs = st.executeQuery("Select raisonSoc from CLIENT NATURAL JOIN QUESTIONNAIRE where idQ = " + this.sondageAct.getId());
+		rs.next();
+		return rs.getString(1);
+	}
+
+	public void sauvegarderCommentaire(String commentaire,int idQ,int numQ) throws SQLException {
+		st = laConnexion.createStatement();
+		ResultSet rsnumAna = st.executeQuery("Select max(idC) from ANALYSE");
+		int numAna = 1;
+		if (rsnumAna.next()){
+			numAna = rsnumAna.getInt(1) + 1;
+		}
+		ResultSet rs = st.executeQuery("Select * from ANALYSE where idQ = " + idQ + " and numQ = " + numQ);
+		if (rs.next()){
+			st.executeUpdate("Update ANALYSE set commentaire = '" + commentaire + "' where idQ = " + idQ + " and numQ = " + numQ);
+		}
+		else{
+			st.executeUpdate("Insert into ANALYSE values (" + idQ + "," + numQ + "," +numAna + ",'" + commentaire + "')");
+		}
+	}
+
+	public String getCommentaire(int idQ,int numQ) throws SQLException {
+		st = laConnexion.createStatement();
+		ResultSet rs = st.executeQuery("Select commentaire from ANALYSE where idQ = " + idQ + " and numQ = " + numQ);
+		if (rs.next()){
+			return rs.getString(1);
+		}
+		return "";
+	}
+
+
 }
 

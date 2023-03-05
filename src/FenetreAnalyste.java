@@ -32,17 +32,18 @@ public class FenetreAnalyste extends BorderPane {
     private Button bsuiv;
     private Button bprec;
     private Button decoB;
-    private Button acceuil;
+    private Button accueil;
     private AnalysteDAO ana;
     private AppliAllo45 app;
     public String typeGraphe;
+    public TextArea commentaire;
         public FenetreAnalyste(Button prec,Button suiv,Button ac,Button decoB,AnalysteDAO ana,AppliAllo45 app){
             super();
             this.bsuiv=suiv;
             this.bprec=prec;
             this.ana=ana;
             this.decoB = decoB;
-            this.acceuil=ac;
+            this.accueil=ac;
             this.app=app;
             this.setStyle(" -fx-base: #ebebeb;");
             this.setTop(this.top());
@@ -65,13 +66,13 @@ public class FenetreAnalyste extends BorderPane {
             HBox boutonG = new HBox();
             HBox logoG = new HBox();
             decoB.setStyle("-fx-font: 22 arial; -fx-base: #ffffff;-fx-background-radius: 10px;");
-            this.acceuil.setStyle("-fx-background-radius: 10px;");
+            this.accueil.setStyle("-fx-background-radius: 10px;");
             Menu menuS = new Menu("Sondage");
             HBox centre = new HBox();
             MenuItem sondage1 = new MenuItem("Nom");
             MenuItem sondage2 = new MenuItem("Panel");
-            sondage1.setOnAction(new ControleurMenuSondageB(this));
-            sondage2.setOnAction(new ControleurMenuSondageA(this));
+            sondage1.setOnAction(new ControlleurMenuSondageB(this));
+            sondage2.setOnAction(new ControlleurMenuSondageA(this));
             Menu menuA = new Menu("Affichage");
             MenuItem affichage1 = new MenuItem("Camembert");
             MenuItem affichage2 = new MenuItem("Histogramme");
@@ -83,7 +84,7 @@ public class FenetreAnalyste extends BorderPane {
             menuS.getItems().addAll(sondage1,sondage2);
             menuBarS.getMenus().addAll(menuS);
             menuBarA.getMenus().addAll(menuA);
-            centre.getChildren().addAll(this.acceuil,menuBarS, menuBarA);
+            centre.getChildren().addAll(this.accueil,menuBarS, menuBarA);
             logoG.getChildren().addAll(logo);
             logoG.setSpacing(20);
             boutonG.getChildren().addAll(decoB);
@@ -152,7 +153,7 @@ public class FenetreAnalyste extends BorderPane {
             Text reinit = new Text("Réinitialiser le tri");
             reinit.setFont(Font.font("verdana", null, FontPosture.REGULAR, 15));
             Button aller = new Button("",tAller);
-            aller.setOnAction(new ControlleurAllerQ(app,this.ana,numAllerA));
+            aller.setOnAction(new ControlleurAllerQ(app,this.ana,numAllerA,this));
             Button triParAge = new Button("",tTriParAge);
             triParAge.setOnAction(new ControlleurTri(this,"Age"));
             Button triSocio = new Button("",tTriSocio);
@@ -190,7 +191,16 @@ public class FenetreAnalyste extends BorderPane {
             VBox botD = new VBox();
             VBox vide = new VBox();
             vide.setPrefSize(150,150);
-            TextArea commentaire = new TextArea();
+            commentaire = new TextArea();
+            commentaire.setWrapText(true);
+            commentaire.setPrefSize(150, 150);
+            commentaire.setText("");
+            try {
+                commentaire.setText(this.ana.getCommentaire(this.ana.getSondage().getId(), this.ana.gQuestion().getNumQ()));
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             botD.getChildren().addAll(commentaire,vide);
             bot.setPrefHeight(200);
             bot.setMaxWidth(600);

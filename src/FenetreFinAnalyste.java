@@ -22,13 +22,21 @@ public class FenetreFinAnalyste  extends BorderPane {
     private Label textent1 ;
     private Label textent2 ;
     private AnalysteDAO ana;
+    private FenetreAnalyste fenAna;
+    private AppliAllo45 app;
     private Button ba;
 
-    public FenetreFinAnalyste(AnalysteDAO ana,Button ba){
+    public FenetreFinAnalyste(AnalysteDAO ana,Button ba,FenetreAnalyste fenAna,AppliAllo45 app){
         super();
         this.ana=ana;
         this.ba=ba;
-        this.nomEnt = new Label("Nom entreprise");
+        this.fenAna = fenAna;
+        this.app=app;
+        try {
+            this.nomEnt = new Label(this.ana.getEntreprise());
+        } catch (SQLException e) {
+            this.nomEnt = new Label("Entreprise introuvable");
+        }
         try {
             this.textent1 = new Label("Intérogés "+this.ana.getInterroges());
         } catch (SQLException e) {
@@ -106,16 +114,14 @@ public class FenetreFinAnalyste  extends BorderPane {
         centerTest.setSpacing(30);
         Button bretour = new Button("  Retour \nSondage");
         bretour.setPrefSize(150, 75);
-        bretour.setStyle("-fx-font: 22 arial; -fx-base: #c2bbf0;-fx-background-radius: 10px;");  
+        bretour.setStyle("-fx-font: 22 arial; -fx-base: #c2bbf0;-fx-background-radius: 10px;");
+        bretour.setOnAction(new ControlleurAllerQ(this.app, ana, null, fenAna));
         Button bclore = new Button("   Clore \nSondage");
         bclore.setPrefSize(150, 75);
-        bclore.setStyle("-fx-font: 22 arial; -fx-base: #5ce1e6;-fx-background-radius: 10px;");       
-        Button bgenerer = new Button("Générer \n    PDF");
-        bgenerer.setPrefSize(150, 75);
-        bgenerer.setStyle("-fx-font: 22 arial; -fx-base: #f1e3f3;-fx-background-radius: 10px;");
+        bclore.setStyle("-fx-font: 22 arial; -fx-base: #5ce1e6;-fx-background-radius: 10px;");
+        bclore.setOnAction(new ControlleurAccueil(this.app));
         centerTest.getChildren().add(bretour);
         centerTest.getChildren().add(bclore);
-        centerTest.getChildren().add(bgenerer);
         centerTest.setPadding(new Insets(10));
         zonetxt.setStyle("-fx-background-color: #FFFFFF;");
         zonetxt.getChildren().addAll(centerTest);

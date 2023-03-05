@@ -23,7 +23,7 @@ public class AppliAllo45 extends Application {
     private GeneralJDBC modGen;
     /**connexion sql */
     private ConnexionMySQL conn; 
-    /**vue acceuil analyste*/
+    /**vue accueil analyste*/
     private FenetreAccueilAnalyste fenAcAna;
     /** vue analyste */
     private FenetreAnalyste fenAna;
@@ -37,11 +37,11 @@ public class AppliAllo45 extends Application {
         this.conn=new ConnexionMySQL();
         this.modGen=new GeneralJDBC(this.conn);
         this.decoB = new Button("Déconnexion");
-        this.decoB.setOnAction(new ControleurDeconnexion(this, this.conn));//init bouton de deco car commun a tout
+        this.decoB.setOnAction(new ControlleurDeconnexion(this, this.conn));//init bouton de deco car commun a tout
         //init de la vue connexion car première vue       
         Button bConn = new Button("Connexion");
         this.fenLog= new Login(bConn);
-        bConn.setOnAction(new ControleurConnexion(this,this.modGen,this.fenLog,this.conn));
+        bConn.setOnAction(new ControlleurConnexion(this,this.modGen,this.fenLog,this.conn));
         
     }
     /**
@@ -82,9 +82,9 @@ public class AppliAllo45 extends Application {
         this.setSondages(s);
         this.modAna= new AnalysteDAO(this.conn, this.sondages.get(0).getQuestions().get(0),this.sondages.get(0));
         Button decoB = new Button("Déconnexion");
-        decoB.setOnAction(new ControleurDeconnexion(this, this.conn));
+        decoB.setOnAction(new ControlleurDeconnexion(this, this.conn));
         this.fenAcAna= new FenetreAccueilAnalyste(decoB,this.modGen,this,this.modAna);
-        this.afficheAcceuilAna();
+        this.afficheAccueilAna();
         
 
     }
@@ -103,15 +103,15 @@ public class AppliAllo45 extends Application {
         }
         this.modAna= new AnalysteDAO(this.conn,sondage.getQuestion(0) ,sondage);
         Button btnPrec = new Button();
-        btnPrec.setOnAction(new ControleurBoutonPrec(this, this.modAna));
         Button btnSuiv = new Button();
-        btnSuiv.setOnAction(new ControleurBoutonSuiv(this, this.modAna));
         Button decoB = new Button("Déconnexion");
-        decoB.setOnAction(new ControleurDeconnexion(this, this.conn));
+        decoB.setOnAction(new ControlleurDeconnexion(this, this.conn));
         Button accueil = new Button("Accueil");
-        accueil.setOnAction(new ControleurAcceuil(this));
+        accueil.setOnAction(new ControlleurAccueil(this));
         this.modAna.setReponses(this.modAna.gQuestion(), this.modAna.getSondage());
         this.fenAna= new FenetreAnalyste(btnPrec,btnSuiv,accueil ,decoB, this.modAna,this);
+        btnPrec.setOnAction(new ControlleurBoutonPrec(this, this.modAna, this.fenAna));
+        btnSuiv.setOnAction(new ControlleurBoutonSuiv(this, this.modAna, this.fenAna));               
         this.fenAna.center(this.modAna.gQuestion());
         this.afficheAna();
 
@@ -121,7 +121,7 @@ public class AppliAllo45 extends Application {
      * @throws SQLException
      * @throws ParseException
      */
-    public void afficheAcceuilAna() throws SQLException, ParseException{
+    public void afficheAccueilAna() throws SQLException, ParseException{
         this.scene.setRoot(this.fenAcAna);
     }
 
@@ -136,8 +136,8 @@ public class AppliAllo45 extends Application {
      */
     public void afficheFinanalyste(){
         Button accueil = new Button("Accueil");
-        accueil.setOnAction(new ControleurAcceuil(this));
-        Pane root = new FenetreFinAnalyste(this.modAna,accueil);
+        accueil.setOnAction(new ControlleurAccueil(this));
+        Pane root = new FenetreFinAnalyste(this.modAna,accueil,this.fenAna,this);
         this.scene.setRoot(root);
     }
     
@@ -147,7 +147,7 @@ public class AppliAllo45 extends Application {
     @Override
     public void start(Stage primaryStage){
         Button bConn = new Button("Connexion");
-        bConn.setOnAction(new ControleurConnexion(this,this.modGen,this.fenLog,this.conn));
+        bConn.setOnAction(new ControlleurConnexion(this,this.modGen,this.fenLog,this.conn));
         Pane root = this.fenLog;
         this.scene = new Scene(root, 1920, 1080);
         primaryStage.setScene(scene);

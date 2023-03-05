@@ -3,13 +3,13 @@ import java.sql.SQLException;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-public class ControleurDeconnexion implements EventHandler<ActionEvent>{
+public class ControlleurDeconnexion implements EventHandler<ActionEvent>{
     private AppliAllo45 app;
     private ConnexionMySQL conn;
 
 
 
-    public ControleurDeconnexion(AppliAllo45 app,ConnexionMySQL co){
+    public ControlleurDeconnexion(AppliAllo45 app,ConnexionMySQL co){
         this.app=app;
         this.conn=co;
     }

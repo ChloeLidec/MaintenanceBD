@@ -4,7 +4,7 @@ import javafx.event.ActionEvent ;
 import javafx.scene.control.Alert;
 
 //controleur pour la connexion
-public class ControleurConnexion implements EventHandler<ActionEvent>{
+public class ControlleurConnexion implements EventHandler<ActionEvent>{
     private AppliAllo45 app;
     private GeneralJDBC mod;
     private Login fenlog;
@@ -12,7 +12,7 @@ public class ControleurConnexion implements EventHandler<ActionEvent>{
 
 
 
-    public ControleurConnexion(AppliAllo45 app, GeneralJDBC mod,Login log,ConnexionMySQL co){
+    public ControlleurConnexion(AppliAllo45 app, GeneralJDBC mod,Login log,ConnexionMySQL co){
         this.app=app;
         this.mod=mod;
         this.fenlog=log;
