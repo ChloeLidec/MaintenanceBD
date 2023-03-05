@@ -264,11 +264,12 @@ public class AnalysteJDBC{
 		st = laConnexion.createStatement();
 		ResultSet rsBase = st.executeQuery("Select idT from TYPEQUESTION NATURAL JOIN QUESTION where numQ = " +questionAct.getNumQ());
 		rsBase.next();
+		System.out.println();
 		List<String> listeCouleurs = new ArrayList<String>();
 		for (int j = 0; j < 10; j++){
 			listeCouleurs.add("#"+Integer.toHexString((int)(Math.random()*16777215)));
 		}
-		if (typeTri.equals("age")){
+		if (typeTri.equals("Age")){
 		if (rsBase.getString(1).equals("u") ){
 			PieChart camembert = new PieChart();
 			//recuperer les reponses a la question actuelle
@@ -283,13 +284,14 @@ public class AnalysteJDBC{
 				data.setName(reponsesQ.getInt(4)+"-"+reponsesQ.getInt(5) +" " + reponsesQ.getString(2) + " : " + data.getPieValue());
 				camembert.getData().add(data);
 				data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
-				
 			}
 			//hide legend
 			camembert.setLegendVisible(false);
+			//set size of chart
+			camembert.setPrefSize(200, 200);
 			return camembert;
 		}
-		else if (rsBase.getString(1).equals("l") || rsBase.getString(1).equals("n")){
+		else if (rsBase.getString(1).equals("n")){
 			PieChart camembert = new PieChart();
 			//recuperer les reponses a la question actuelle
 			int i = -1;
@@ -303,16 +305,39 @@ public class AnalysteJDBC{
 				camembert.getData().add(data);
 				data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
 			}
+			//hide legend
+			camembert.setLegendVisible(false);
+			//set size of chart
+			camembert.setPrefSize(200, 200);
+			return camembert;
+		}
+		else if (rsBase.getString(1).equals("l")){
+			PieChart camembert = new PieChart();
+			//recuperer les reponses a la question actuelle
+			String val = "";
+			int i = -1;
+			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur,idTr,valDebut,valFin from REPONDRE NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idTr order by REPONDRE.valeur;");
+			while (reponsesQ.next()){
+				if (val.equals("") || !val.equals(reponsesQ.getString(2))){
+					val = reponsesQ.getString(2);
+					i++;
+				}
+				PieChart.Data data = new PieChart.Data(reponsesQ.getString(4)+"-"+reponsesQ.getString(5) + " " + reponsesQ.getString(2), reponsesQ.getInt(1));
+				data.setName(reponsesQ.getString(4)+"-"+reponsesQ.getString(5) + " " + reponsesQ.getString(2) + " : " + data.getPieValue());
+				camembert.getData().add(data);
+				data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
+			}
+			//hide legend
+			camembert.setLegendVisible(false);
+			//set size of chart
+			camembert.setPrefSize(200, 200);
 			return camembert;
 		}
 		
 		else if (rsBase.getString(1).equals("c")){
-			HashMap<String,Float> dico_rep = new HashMap<>();
-			ResultSet valPoss = st.executeQuery("Select valeur from VALPOSSIBLE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
-				while(valPoss.next()){
-					dico_rep.put(valPoss.getString(1), 0f);
-				}
-				ResultSet rs = st.executeQuery("Select valeur from REPONDRE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
+			HashMap<String,HashMap<String,Float>> dico_rep = new HashMap<>();
+			
+				ResultSet rs = st.executeQuery("Select valeur,idTr,valDebut,valFin from REPONDRE NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ()+ " group by valeur,idTr order by idTr");
 				//je met en place un systeme de points 1ere place =1 2e=0.5 3e=0.25
 				while(rs.next()){
 					String[] vals = rs.getString(1).split(";");
@@ -320,25 +345,55 @@ public class AnalysteJDBC{
 						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
 						rsval.next();
 						String val = rsval.getString(1);
+						if(!dico_rep.containsKey(val)){
+							HashMap<String,Float> dico = new HashMap<>();
+							dico_rep.put(val, dico);
+						}
 						if(i==0){
-							dico_rep.put(val, dico_rep.get(val)+1f);
+							HashMap<String,Float> dico = dico_rep.get(val);
+							if (dico.containsKey(rs.getString(3) + "-" + rs.getString(4))){
+								dico.put(rs.getString(3) + "-" + rs.getString(4), dico.get(rs.getString(3) + "-" + rs.getString(4))+1f);
+							}
+							else{
+								dico.put(rs.getString(3) + "-" + rs.getString(4), 1f);
+							}
 						}
 						else if(i==1){
-							dico_rep.put(val, dico_rep.get(val)+0.5f);
+							HashMap<String,Float> dico = dico_rep.get(val);
+							if (dico.containsKey(rs.getString(3) + "-" + rs.getString(4))){
+								dico.put(rs.getString(3) + "-" + rs.getString(4), dico.get(rs.getString(3) + "-" + rs.getString(4))+0.5f);
+							}
+							else{
+								dico.put(rs.getString(3) + "-" + rs.getString(4), 0.5f);
+							}
 						}
 						else if(i==2){
-							dico_rep.put(val, dico_rep.get(val)+0.25f);
+							HashMap<String,Float> dico = dico_rep.get(val);
+							if (dico.containsKey(rs.getString(3) + "-" + rs.getString(4))){
+								dico.put(rs.getString(3) + "-" + rs.getString(4), dico.get(rs.getString(3) + "-" + rs.getString(4))+0.25f);
+							}
+							else{
+								dico.put(rs.getString(3) + "-" + rs.getString(4), 0.25f);
+							}
 						}
 					}	
-				} 
-				PieChart camembert = new PieChart();
-				for (String key : dico_rep.keySet()){
-					PieChart.Data slice = new PieChart.Data(key, dico_rep.get(key));
-					slice.setName(key+"->"+slice.getPieValue());
-					camembert.getData().add(slice);
 				}
-				return camembert;
-		} }
+				PieChart camembert = new PieChart();
+				int i = -1;
+				for (String valrep : dico_rep.keySet()){
+					i++;
+					for (String tranche : dico_rep.get(valrep).keySet()){
+						PieChart.Data slice = new PieChart.Data(tranche+":"+valrep, dico_rep.get(valrep).get(tranche));
+						slice.setName(tranche+":"+valrep+"->"+slice.getPieValue());
+						camembert.getData().add(slice);
+						slice.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
+					}
+				}
+			camembert.setLegendVisible(false);
+			//set size of chart
+			camembert.setPrefSize(200, 200);
+			return camembert;
+		}}
 		return null;
 	}
 	/**
