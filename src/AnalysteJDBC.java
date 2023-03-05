@@ -287,7 +287,7 @@ public class AnalysteJDBC{
 			//hide legend
 			camembert.setLegendVisible(false);
 			//set size of chart
-			camembert.setPrefSize(200, 200);
+			
 			return camembert;
 		}
 		else if (rsBase.getString(1).equals("n")){
@@ -307,7 +307,7 @@ public class AnalysteJDBC{
 			//hide legend
 			camembert.setLegendVisible(false);
 			//set size of chart
-			camembert.setPrefSize(200, 200);
+			
 			return camembert;
 		}
 		else if (rsBase.getString(1).equals("l")){
@@ -329,7 +329,7 @@ public class AnalysteJDBC{
 			//hide legend
 			camembert.setLegendVisible(false);
 			//set size of chart
-			camembert.setPrefSize(200, 200);
+			
 			return camembert;
 		}
 		
@@ -390,10 +390,11 @@ public class AnalysteJDBC{
 				}
 			camembert.setLegendVisible(false);
 			//set size of chart
-			camembert.setPrefSize(200, 200);
+			
 			return camembert;
 		}}
 		else if (typeTri.equals("Socio")){
+			HashMap<Integer,String> dico_categ = new HashMap<>();
 			if (rsBase.getString(1).equals("u") ){
 				PieChart camembert = new PieChart();
 				//recuperer les reponses a la question actuelle
@@ -403,16 +404,15 @@ public class AnalysteJDBC{
 					if (i == -1 || i != reponsesQ.getInt(5)){
 						i = reponsesQ.getInt(5);
 					}
-					//check if data already exists
-					PieChart.Data data = new PieChart.Data(reponsesQ.getString(4)+ " " + reponsesQ.getString(2), reponsesQ.getInt(1));
+					dico_categ.put(reponsesQ.getInt(3), reponsesQ.getString(4));
+					PieChart.Data data = new PieChart.Data(reponsesQ.getString(3)+ " " + reponsesQ.getString(2), reponsesQ.getInt(1));
 					data.setName(reponsesQ.getString(4) +" " + reponsesQ.getString(2) + " : " + data.getPieValue());
 					camembert.getData().add(data);
 					data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
 				}
-				//hide legend
+				
 				camembert.setLegendVisible(false);
 				//set size of chart
-				camembert.setPrefSize(200, 200);
 				return camembert;
 			}
 			else if (rsBase.getString(1).equals("n")){
@@ -432,7 +432,6 @@ public class AnalysteJDBC{
 				//hide legend
 				camembert.setLegendVisible(false);
 				//set size of chart
-				camembert.setPrefSize(200, 200);
 				return camembert;
 			}
 			else if (rsBase.getString(1).equals("l")){
@@ -454,7 +453,7 @@ public class AnalysteJDBC{
 				//hide legend
 				camembert.setLegendVisible(false);
 				//set size of chart
-				camembert.setPrefSize(200, 200);
+				
 				return camembert;
 			}
 			
@@ -515,7 +514,7 @@ public class AnalysteJDBC{
 					}
 				camembert.setLegendVisible(false);
 				//set size of chart
-				camembert.setPrefSize(200, 200);
+				
 				return camembert;
 			}
 		}

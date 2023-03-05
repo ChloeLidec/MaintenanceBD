@@ -108,7 +108,7 @@ public class FenetreAnalyste extends BorderPane {
             VBox center = new VBox();
             center.setAlignment(Pos.CENTER);
             Text ques =new Text(this.ana.gQuestion().getTexte());
-            ques.setWrappingWidth(200);
+            ques.setWrappingWidth(800);
             center.getChildren().addAll(new Text("Question "+this.ana.gQuestion().getNumQ()),ques);
             if(q.getType().equals("u")){          
                 this.typeGraphe="Bar";
@@ -230,7 +230,7 @@ public class FenetreAnalyste extends BorderPane {
             VBox center = new VBox();
             center.setAlignment(Pos.CENTER);
             Text ques =new Text(this.ana.gQuestion().getTexte());
-            ques.setWrappingWidth(200);
+            ques.setWrappingWidth(800);
             center.getChildren().addAll(new Text("Question "+this.ana.gQuestion().getNumQ()),ques);
             if (type.equals("Bar")) {
                 BarChart bar = null;
@@ -265,6 +265,12 @@ public class FenetreAnalyste extends BorderPane {
             }
 
         public void changerGrapheTri(String type, String tri){
+            VBox center = new VBox();
+            center.setAlignment(Pos.CENTER);
+            Text ques =new Text(this.ana.gQuestion().getTexte());
+            ques.setWrappingWidth(800);
+            center.getChildren().addAll(new Text("Question "+this.ana.gQuestion().getNumQ()),ques);
+
             if (type == "Pie") {
                 PieChart pie = null;
                 try {
@@ -277,7 +283,7 @@ public class FenetreAnalyste extends BorderPane {
                     a.showAndWait();
                 } else {
                     this.typeGraphe = "Pie";
-                    this.setCenter(pie);
+                    center.getChildren().add(pie);
                 }
             } 
             else if (type =="Bar") {
@@ -292,10 +298,10 @@ public class FenetreAnalyste extends BorderPane {
                     a.showAndWait();
                 } else {
                     this.typeGraphe = "Bar";
-                    this.setCenter(bar);
+                    center.getChildren().add(bar);
                 }
             }
-            
+            this.setCenter(center);
         }
         }
        

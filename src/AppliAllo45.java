@@ -223,7 +223,7 @@ public class AppliAllo45 extends Application {
         Button bConn = new Button("Connexion");
         bConn.setOnAction(new ControleurConnexion(this,this.modGen,this.fenLog,this.conn));
         Pane root = this.fenLog;
-        this.scene = new Scene(root, 1280, 1024);
+        this.scene = new Scene(root, 1920, 1080);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Allo45");
         primaryStage.show();
