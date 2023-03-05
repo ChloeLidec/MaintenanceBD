@@ -393,6 +393,132 @@ public class AnalysteJDBC{
 			camembert.setPrefSize(200, 200);
 			return camembert;
 		}}
+		else if (typeTri.equals("Socio")){
+			if (rsBase.getString(1).equals("u") ){
+				PieChart camembert = new PieChart();
+				//recuperer les reponses a la question actuelle
+				ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur,idCat,intituleCat,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN CATEGORIE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idCat order by REPONDRE.valeur;");
+				int i = -1;
+				while (reponsesQ.next()){
+					if (i == -1 || i != reponsesQ.getInt(5)){
+						i = reponsesQ.getInt(5);
+					}
+					//check if data already exists
+					PieChart.Data data = new PieChart.Data(reponsesQ.getString(4)+ " " + reponsesQ.getString(2), reponsesQ.getInt(1));
+					data.setName(reponsesQ.getString(4) +" " + reponsesQ.getString(2) + " : " + data.getPieValue());
+					camembert.getData().add(data);
+					data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
+				}
+				//hide legend
+				camembert.setLegendVisible(false);
+				//set size of chart
+				camembert.setPrefSize(200, 200);
+				return camembert;
+			}
+			else if (rsBase.getString(1).equals("n")){
+				PieChart camembert = new PieChart();
+				//recuperer les reponses a la question actuelle
+				int i = -1;
+				ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur,idCat,intituleCat from REPONDRE NATURAL JOIN CARACTERISTIQUE NATURAL JOIN CATEGORIE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idCat order by REPONDRE.valeur;");
+				while (reponsesQ.next()){
+					if (i == -1 || i != reponsesQ.getInt(2)){
+						i = reponsesQ.getInt(2);
+					}
+					PieChart.Data data = new PieChart.Data(reponsesQ.getString(4) + " " + reponsesQ.getString(2), reponsesQ.getInt(1));
+					data.setName(reponsesQ.getString(4) + " " + reponsesQ.getString(2) + " : " + data.getPieValue());
+					camembert.getData().add(data);
+					data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
+				}
+				//hide legend
+				camembert.setLegendVisible(false);
+				//set size of chart
+				camembert.setPrefSize(200, 200);
+				return camembert;
+			}
+			else if (rsBase.getString(1).equals("l")){
+				PieChart camembert = new PieChart();
+				//recuperer les reponses a la question actuelle
+				String val = "";
+				int i = -1;
+				ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur,idCat,intituleCat from REPONDRE NATURAL JOIN CARACTERISTIQUE NATURAL JOIN CATEGORIE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idCat order by REPONDRE.valeur;");
+				while (reponsesQ.next()){
+					if (val.equals("") || !val.equals(reponsesQ.getString(2))){
+						val = reponsesQ.getString(2);
+						i++;
+					}
+					PieChart.Data data = new PieChart.Data(reponsesQ.getString(4)+ " " + reponsesQ.getString(2), reponsesQ.getInt(1));
+					data.setName(reponsesQ.getString(4)+ " " + reponsesQ.getString(2) + " : " + data.getPieValue());
+					camembert.getData().add(data);
+					data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
+				}
+				//hide legend
+				camembert.setLegendVisible(false);
+				//set size of chart
+				camembert.setPrefSize(200, 200);
+				return camembert;
+			}
+			
+			else if (rsBase.getString(1).equals("c")){
+				HashMap<String,HashMap<String,Float>> dico_rep = new HashMap<>();
+				
+					ResultSet rs = st.executeQuery("Select valeur,idCat,intituleCat from REPONDRE NATURAL JOIN CARACTERISTIQUE NATURAL JOIN CATEGORIE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ()+ " group by valeur,idCat order by idCat");
+					//je met en place un systeme de points 1ere place =1 2e=0.5 3e=0.25
+					while(rs.next()){
+						String[] vals = rs.getString(1).split(";");
+						for(int i=0;i<vals.length;i++){
+							ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
+							rsval.next();
+							String val = rsval.getString(1);
+							if(!dico_rep.containsKey(val)){
+								HashMap<String,Float> dico = new HashMap<>();
+								dico_rep.put(val, dico);
+							}
+							if(i==0){
+								HashMap<String,Float> dico = dico_rep.get(val);
+								if (dico.containsKey(rs.getString(3))){
+									dico.put(rs.getString(3), dico.get(rs.getString(3))+1f);
+								}
+								else{
+									dico.put(rs.getString(3), 1f);
+								}
+							}
+							else if(i==1){
+								HashMap<String,Float> dico = dico_rep.get(val);
+								if (dico.containsKey(rs.getString(3) )){
+									dico.put(rs.getString(3), dico.get(rs.getString(3))+0.5f);
+								}
+								else{
+									dico.put(rs.getString(3), 0.5f);
+								}
+							}
+							else if(i==2){
+								HashMap<String,Float> dico = dico_rep.get(val);
+								if (dico.containsKey(rs.getString(3))){
+									dico.put(rs.getString(3), dico.get(rs.getString(3))+0.25f);
+								}
+								else{
+									dico.put(rs.getString(3), 0.25f);
+								}
+							}
+						}	
+					}
+					PieChart camembert = new PieChart();
+					int i = -1;
+					for (String valrep : dico_rep.keySet()){
+						i++;
+						for (String tranche : dico_rep.get(valrep).keySet()){
+							PieChart.Data slice = new PieChart.Data(tranche+":"+valrep, dico_rep.get(valrep).get(tranche));
+							slice.setName(tranche+":"+valrep+"->"+slice.getPieValue());
+							camembert.getData().add(slice);
+							slice.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
+						}
+					}
+				camembert.setLegendVisible(false);
+				//set size of chart
+				camembert.setPrefSize(200, 200);
+				return camembert;
+			}
+		}
 		return null;
 	}
 	/**
