@@ -98,8 +98,7 @@ public class AnalysteJDBC{
 
 	public void allerAQ(int id){
 		try{
-			id = this.sondageAct.getQuestions().get(id-1).getNumQ();
-			this.questionAct = this.getQuestion(id);
+			this.questionAct = this.sondageAct.getQuestion(id-1);
 		}
 		catch(Exception e){
 			Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -902,6 +901,18 @@ public class AnalysteJDBC{
 	 */
 	public String getInfosPanel(){
 		return "Nom du Panel: "+this.sondageAct.getPanel().getNom();
+	}
+	public int getReponsesComplettes() throws SQLException {
+		st = laConnexion.createStatement();
+		ResultSet rs = st.executeQuery("Select count(*) from REPONDRE where idQ = " + this.sondageAct.getId() + " group by numQ;");
+		rs.next();
+		return rs.getInt(1);
+	}
+	public int getInterroges() throws SQLException {
+		st = laConnexion.createStatement();
+		ResultSet rs = st.executeQuery("Select count(*) from INTERROGER where idQ = " + this.sondageAct.getId() );
+		rs.next();
+		return rs.getInt(1);
 	}
 }
 
