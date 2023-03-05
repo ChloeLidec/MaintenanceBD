@@ -225,7 +225,7 @@ public class AnalysteDAO{
 		
 		else if (rsBase.getString(1).equals("c")){
 			HashMap<String,Float> dico_rep = new HashMap<>();
-			ResultSet valPoss = st.executeQuery("Select valeur from VALPOSSIBLE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
+			ResultSet valPoss = st.executeQuery("Select texteVal from VALPOSSIBLE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
 				while(valPoss.next()){
 					dico_rep.put(valPoss.getString(1), 0f);
 				}
@@ -234,7 +234,7 @@ public class AnalysteDAO{
 				while(rs.next()){
 					String[] vals = rs.getString(1).split(";");
 					for(int i=0;i<vals.length;i++){
-						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
+						ResultSet rsval = st.executeQuery("Select texteVal from VALPOSSIBLE where idV = " + vals[i]);
 						rsval.next();
 						String val = rsval.getString(1);
 						if(i==0){
@@ -340,7 +340,7 @@ public class AnalysteDAO{
 				while(rs.next()){
 					String[] vals = rs.getString(1).split(";");
 					for(int i=0;i<vals.length;i++){
-						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
+						ResultSet rsval = st.executeQuery("Select texteVal from VALPOSSIBLE where idV = " + vals[i]);
 						rsval.next();
 						String val = rsval.getString(1);
 						if(!dico_rep.containsKey(val)){
@@ -464,7 +464,7 @@ public class AnalysteDAO{
 					while(rs.next()){
 						String[] vals = rs.getString(1).split(";");
 						for(int i=0;i<vals.length;i++){
-							ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
+							ResultSet rsval = st.executeQuery("Select texteVal from VALPOSSIBLE where idV = " + vals[i]);
 							rsval.next();
 							String val = rsval.getString(1);
 							if(!dico_rep.containsKey(val)){
@@ -536,7 +536,7 @@ public class AnalysteDAO{
 		//dic of string float
 		HashMap<String,Float> dico_rep = new HashMap<>();
 		if (rsBase.getString(1).equals("c")){
-				ResultSet valPoss = st.executeQuery("Select valeur from VALPOSSIBLE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
+				ResultSet valPoss = st.executeQuery("Select texteVal from VALPOSSIBLE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
 				while(valPoss.next()){
 					dico_rep.put(valPoss.getString(1), 0f);
 				}
@@ -545,7 +545,7 @@ public class AnalysteDAO{
 				while(rs.next()){
 					String[] vals = rs.getString(1).split(";");
 					for(int i=0;i<vals.length;i++){
-						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
+						ResultSet rsval = st.executeQuery("Select texteVal from VALPOSSIBLE where idV = " + vals[i]);
 						rsval.next();
 						String val = rsval.getString(1);
 						if(i==0){
@@ -630,7 +630,7 @@ public class AnalysteDAO{
 			while(rs.next()){
 				String[] vals = rs.getString(1).split(";");
 				for(int i=0;i<vals.length;i++){
-					ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
+					ResultSet rsval = st.executeQuery("Select texteVal from VALPOSSIBLE where idV = " + vals[i]);
 					rsval.next();
 					String val = rsval.getString(1);
 					if(!dico_rep.containsKey(val)){
@@ -755,7 +755,7 @@ public class AnalysteDAO{
 				while(rs.next()){
 					String[] vals = rs.getString(1).split(";");
 					for(int i=0;i<vals.length;i++){
-						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
+						ResultSet rsval = st.executeQuery("Select texteVal from VALPOSSIBLE where idV = " + vals[i]);
 						rsval.next();
 						String val = rsval.getString(1);
 						if(!dico_rep.containsKey(val)){

@@ -65,10 +65,7 @@ public class FenetreAnalyste extends BorderPane {
             HBox boutonG = new HBox();
             HBox logoG = new HBox();
             decoB.setStyle("-fx-font: 22 arial; -fx-base: #ffffff;-fx-background-radius: 10px;");
-            
-            this.acceuil.setStyle("IDLE_BUTTON_STYLE; -fx-background-radius: 10px;");
-            Button aide = new Button("Aide");
-            aide.setStyle("-fx-background-radius: 10px;");
+            this.acceuil.setStyle("-fx-background-radius: 10px;");
             Menu menuS = new Menu("Sondage");
             HBox centre = new HBox();
             MenuItem sondage1 = new MenuItem("Nom");
@@ -86,7 +83,7 @@ public class FenetreAnalyste extends BorderPane {
             menuS.getItems().addAll(sondage1,sondage2);
             menuBarS.getMenus().addAll(menuS);
             menuBarA.getMenus().addAll(menuA);
-            centre.getChildren().addAll(this.acceuil,menuBarS, menuBarA, aide);
+            centre.getChildren().addAll(this.acceuil,menuBarS, menuBarA);
             logoG.getChildren().addAll(logo);
             logoG.setSpacing(20);
             boutonG.getChildren().addAll(decoB);
