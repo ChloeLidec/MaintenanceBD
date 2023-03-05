@@ -19,14 +19,10 @@ public class AppliAllo45 extends Application {
     private Login fenLog;
     /**modele analyste */
     private AnalysteDAO modAna;
-    /**modele sondeur */
-    private SondeurJDBC modSond;
     /**modele general */
     private GeneralJDBC modGen;
     /**connexion sql */
     private ConnexionMySQL conn; 
-    /**vue sondeur */
-    private FenetreSondeur fenSond;
     /**vue acceuil analyste*/
     private FenetreAccueilAnalyste fenAcAna;
     /** vue analyste */
@@ -68,78 +64,14 @@ public class AppliAllo45 extends Application {
             this.afficheAna();
         }
         //si on est dans le module sondeur
-        else if(this.modSond !=null){
-            Question q = this.modSond.getQuestion();
-            this.fenSond.bottom();
-            this.fenSond.top();
-            this.fenSond.left();
-            this.fenSond.right();
-            if(q.getType().equals("u")){            
-                this.fenSond.modeChoixS(this.modSond.getQuestion());
-                this.afficheSondeur1();
-            }
-            else if(q.getType().equals("n")){
-                this.fenSond.modeChoixN(this.modSond.getQuestion());
-                this.afficheSondeur1();
-            } 
-            else if(q.getType().equals("l")){
-                this.fenSond.modeChoixL(this.modSond.getQuestion());
-                this.afficheSondeur1();
-            }
-            else if(q.getType().equals("c")){
-                this.fenSond.modeChoixC(this.modSond.getQuestion());
-                this.afficheSondeur1();
-            }
-            else{this.fenSond.modeChoixM(this.modSond.getQuestion());
-                this.afficheSondeur1();
-            }
-
-        }
+        
     }
     /**
      * met en place le modele sondeur
      * @throws SQLException
      * @throws ParseException
     */
-    public void modesondeur() throws SQLException, ParseException{
-        List<Sondage> s =this.modGen.getSondageSondeur();
-        this.setSondages(s);
-        this.modSond= new SondeurJDBC(this.sondages.get(0), this.sondages.get(0).getQuestions().get(0),this.conn,this.sondages);
-        Button btnPrec = new Button();
-        btnPrec.setOnAction(new ControleurBoutonPrec(this, this.modSond,null));
-        Button btnSuiv = new Button();
-        btnSuiv.setOnAction(new ControleurBoutonSuiv(this, this.modSond, null));
-        Button btnAnnuler = new Button("Annuler");
-        Button next = new Button("Suivant");
-        btnAnnuler.setOnAction(new ControleurBoutonSuivUtil(this, this.modSond));
-        next.setOnAction(new ControleurBoutonSuivUtil(this, this.modSond));
-        Question q = this.sondages.get(0).getQuestion(0);
-        this.modSond.setQuestion(q);
-        this.modSond.setSondage(s.get(0));
-        this.modSond.setSonde(s.get(0).getPanel().getListSonde().get(0));
-        this.fenSond= new FenetreSondeur(btnPrec,btnSuiv,next,btnAnnuler,this.decoB,this.modSond);
-        this.modSond.setVue(this.fenSond);
-        if(q.getType().equals("u")){            
-            this.fenSond.modeChoixS(this.modSond.getQuestion());
-            this.afficheSondeur1();
-        }
-        else if(q.getType().equals("n")){
-            this.fenSond.modeChoixN(this.modSond.getQuestion());
-            this.afficheSondeur1();
-        } 
-        else if(q.getType().equals("l")){
-            this.fenSond.modeChoixL(this.modSond.getQuestion());
-            this.afficheSondeur1();
-        }
-        else if(q.getType().equals("c")){
-            this.fenSond.modeChoixC(this.modSond.getQuestion());
-            this.afficheSondeur1();
-        }
-        else{this.fenSond.modeChoixM(this.modSond.getQuestion());
-            this.afficheSondeur1();
-        }
-
-    }
+    
     /**
      * met en place l accueil de l analyste
      * @throws SQLException
@@ -192,13 +124,7 @@ public class AppliAllo45 extends Application {
     public void afficheAcceuilAna() throws SQLException, ParseException{
         this.scene.setRoot(this.fenAcAna);
     }
-    /**
-     * affiche le sondeur
-     */
-    public void afficheSondeur1(){
-        this.scene.setRoot(this.fenSond);
 
-    }
     /**
      * affiche l analyste
      */
