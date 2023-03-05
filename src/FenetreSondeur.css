@@ -1,4 +1,6 @@
-
+.axis {
+     -fx-tick-label-font-size: 10px;
+ }
  
  .radio-button .radio {
      -fx-border-width: 1px;

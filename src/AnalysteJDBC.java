@@ -748,6 +748,149 @@ public class AnalysteJDBC{
 			}
 			return battons;
 		}}
+		else if (typeTri.equals("Socio")){
+			if (rsBase.getString(1).equals("c")){
+				HashMap<String,HashMap<String,Float>> dico_rep = new HashMap<>();
+				ResultSet rs = st.executeQuery("Select valeur,idCat,intituleCat from REPONDRE NATURAL JOIN CARACTERISTIQUE NATURAL JOIN CATEGORIE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ()+ " group by valeur,idCat order by idCat");
+				//je met en place un systeme de points 1ere place =1 2e=0.5 3e=0.25
+				while(rs.next()){
+					String[] vals = rs.getString(1).split(";");
+					for(int i=0;i<vals.length;i++){
+						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + vals[i]);
+						rsval.next();
+						String val = rsval.getString(1);
+						if(!dico_rep.containsKey(val)){
+							HashMap<String,Float> dico = new HashMap<>();
+							dico_rep.put(val, dico);
+						}
+						String cat = rs.getString(3);
+						String finalS = "";
+						for (String s : cat.split(" ")){
+							finalS += s+"\n";
+						}
+						if(i==0){
+							HashMap<String,Float> dico = dico_rep.get(val);
+							if (dico.containsKey(finalS)){
+								dico.put(finalS, dico.get(finalS)+1f);
+							}
+							else{
+								dico.put(finalS, 1f);
+							}
+						}
+						else if(i==1){
+							HashMap<String,Float> dico = dico_rep.get(val);
+							if (dico.containsKey(finalS)){
+								dico.put(finalS, dico.get(finalS)+0.5f);
+							}
+							else{
+								dico.put(finalS, 0.5f);
+							}
+						}
+						else if(i==2){
+							HashMap<String,Float> dico = dico_rep.get(val);
+							if (dico.containsKey(finalS)){
+								dico.put(finalS, dico.get(finalS)+0.25f);
+							}
+							else{
+								dico.put(finalS, 0.25f);
+							}
+						}
+					}	
+				}
+					for (String key : dico_rep.keySet()){
+						XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+						series.setName(key);
+						for (String key2 : dico_rep.get(key).keySet()){
+							series.getData().add(new XYChart.Data<String, Number>(key2, dico_rep.get(key).get(key2)));
+						}
+						battons.getData().add(series);
+					}		
+					Collections.sort(battons.getData(), new Comparator<XYChart.Series<String, Number>>() {
+						@Override
+						public int compare(XYChart.Series<String, Number> o1, XYChart.Series<String, Number> o2) {
+							return o1.getData().get(0).getYValue().intValue() - o2.getData().get(0).getYValue().intValue();
+						}
+					});
+					return battons;
+			}
+			else if (rsBase.getString(1).equals("u")){
+				ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur,idCat,intituleCat,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN CATEGORIE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idCat order by REPONDRE.valeur;");
+				String val = "";
+				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+				while(rs.next()){
+					if (!val.equals(rs.getString(2))){
+						if (!val.equals("")){
+							battons.getData().add(series);
+						}
+						val = rs.getString(2);
+						series = new XYChart.Series<String, Number>();
+						series.setName(rs.getString(2));
+					}
+					String finalS = "";
+					for (String s : rs.getString(4).split(" ")){
+						finalS += s+"\n";
+					}
+						series.getData().add(new XYChart.Data<String, Number>(finalS, rs.getInt(1)));		
+				}
+				battons.getData().add(series);
+				Collections.sort(battons.getData(), new Comparator<XYChart.Series<String, Number>>() {
+					@Override
+					public int compare(XYChart.Series<String, Number> o1, XYChart.Series<String, Number> o2) {
+						return o1.getData().get(0).getYValue().intValue() - o2.getData().get(0).getYValue().intValue();
+					}
+				});
+				return battons;
+			}
+			else if (rsBase.getString(1).equals("n") || rsBase.getString(1).equals("l")){
+				ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur,idCat,intituleCat from REPONDRE NATURAL JOIN CARACTERISTIQUE NATURAL JOIN CATEGORIE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idCat order by REPONDRE.valeur;");
+				String val = "";
+				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+				while(rs.next()){
+					if (rsBase.getString(1).equals("l")){
+						if (!val.equals(rs.getString(2))){
+							if (!val.equals("")){
+								battons.getData().add(series);
+							}
+							val = rs.getString(2);
+							series = new XYChart.Series<String, Number>();
+							series.setName(rs.getString(2));
+						}
+						String finalS = "";
+						for (String s : rs.getString(4).split(" ")){
+							finalS += s+"\n";
+						}
+							series.getData().add(new XYChart.Data<String, Number>(finalS, rs.getInt(1)));
+					}
+					else if (rsBase.getString(1).equals("n")){
+						if (!val.equals(rs.getInt(2)+"")){
+							if (!val.equals("")){
+								battons.getData().add(series);
+							}
+							val = rs.getInt(2) + "";
+							series = new XYChart.Series<String, Number>();
+							series.setName(rs.getInt(2)+"");
+						}
+						String finalS = "";
+						for (String s : rs.getString(4).split(" ")){
+							finalS += s+"\n";
+						}
+							series.getData().add(new XYChart.Data<String, Number>(finalS, rs.getInt(1)));
+					}
+					
+				}
+				battons.getData().add(series);
+				if (rsBase.getString(1).equals("n")){
+					Collections.sort(battons.getData(), new Comparator<XYChart.Series<String, Number>>() {
+						@Override
+						public int compare(XYChart.Series<String, Number> o1, XYChart.Series<String, Number> o2) {
+							//compare int of string
+							return Integer.parseInt(o1.getName()) - Integer.parseInt(o2.getName());
+						}
+					});
+				}
+				return battons;
+			}
+		}
 		
 		
 		return null;

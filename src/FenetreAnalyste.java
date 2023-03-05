@@ -244,6 +244,7 @@ public class FenetreAnalyste extends BorderPane {
                     a.showAndWait();
                 } else {
                     this.typeGraphe = "Bar";
+                    
                     center.getChildren().add(bar);
                 }
             } else if (type.equals("Pie")) {
@@ -298,6 +299,8 @@ public class FenetreAnalyste extends BorderPane {
                     a.showAndWait();
                 } else {
                     this.typeGraphe = "Bar";
+                    //put the series name horizontal
+                    bar.getXAxis().setAutoRanging(true);
                     center.getChildren().add(bar);
                 }
             }
