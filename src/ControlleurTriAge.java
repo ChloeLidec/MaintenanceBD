@@ -11,7 +11,7 @@ public class ControlleurTriAge implements EventHandler<ActionEvent>{
 
     @Override
     public void handle(ActionEvent actionEvent) {
-
-        this.vue.changerGrapheTri("Pie", "Age");;
-        }
+        String chart = this.vue.typeGraphe;
+        this.vue.changerGrapheTri(chart, "Age");
+    }
 }

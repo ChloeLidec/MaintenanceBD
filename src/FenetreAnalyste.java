@@ -35,7 +35,7 @@ public class FenetreAnalyste extends BorderPane {
     private Button acceuil;
     private AnalysteJDBC ana;
     private AppliAllo45 app;
-    private String typeGraphe;
+    public String typeGraphe;
         public FenetreAnalyste(Button prec,Button suiv,Button ac,Button decoB,AnalysteJDBC ana,AppliAllo45 app){
             super();
             this.bsuiv=suiv;
@@ -279,6 +279,51 @@ public class FenetreAnalyste extends BorderPane {
                     this.setCenter(pie);
                 }
             } 
+            else if (type =="Bar" && tri == "Age") {
+                BarChart bar = null;
+                try {
+                    bar = this.ana.getHistoTri(tri);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                if (bar == null) {
+                    Alert a = new Alert(Alert.AlertType.INFORMATION,"Représentation impossible");
+                    a.showAndWait();
+                } else {
+                    this.typeGraphe = "Bar";
+                    this.setCenter(bar);
+                }
+            }
+            else if (type == "Pie" && tri == "Socio") {
+                PieChart pie = null;
+                try {
+                    pie = this.ana.getPieTri(tri);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                if (pie == null) {
+                    Alert a = new Alert(Alert.AlertType.INFORMATION,"Représentation impossible");
+                    a.showAndWait();
+                } else {
+                    this.typeGraphe = "Pie";
+                    this.setCenter(pie);
+                }
+            } 
+            else if (type =="Bar" && tri == "Socio") {
+                BarChart bar = null;
+                try {
+                    bar = this.ana.getHistoTri(tri);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                if (bar == null) {
+                    Alert a = new Alert(Alert.AlertType.INFORMATION,"Représentation impossible");
+                    a.showAndWait();
+                } else {
+                    this.typeGraphe = "Bar";
+                    this.setCenter(bar);
+                }
+            }
         }
         }
        
