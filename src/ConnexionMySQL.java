@@ -13,7 +13,7 @@ public class ConnexionMySQL {
 		this.mysql=null;
 		this.connecte=false;
 		this.mysql = DriverManager.getConnection(
-					"jdbc:mysql://localhost:3306/sondage","lidec","lidec");
+					"jdbc:mysql://127.0.0.1:3306/sondage","lidec","lidec");
 		this.connecte=true;
 	}
 	public void close() throws SQLException {

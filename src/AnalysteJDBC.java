@@ -223,34 +223,7 @@ public class AnalysteJDBC{
 			}
 			return camembert;
 		}
-		else if (rsBase.getString(1).equals("m")){
-			PieChart camembert = new PieChart();
-			HashMap<String,Integer> dico_rep = new HashMap<>();
-			
-				ResultSet reponsesQ = st.executeQuery("Select valeur from REPONDRE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ() + ";");
-				while(reponsesQ.next()){
-					String[] vals = reponsesQ.getString(1).split(";");
-					for(String item :vals){
-						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + item);
-						rsval.next();
-						String val = rsval.getString(1);
-						if(!(dico_rep.containsKey(val))){
-							dico_rep.put(val, reponsesQ.getInt(1));
-						}
-						else{
-							dico_rep.put(val, dico_rep.get(val)+reponsesQ.getInt(1));
-						}
-					}
-				
-			}
-			for (String key : dico_rep.keySet()){
-				PieChart.Data slice = new PieChart.Data(key, dico_rep.get(key));
-				slice.setName(key+"->"+slice.getPieValue());
-				camembert.getData().add(slice);
-			}
-			return camembert;
-
-		}
+		
 		else if (rsBase.getString(1).equals("c")){
 			HashMap<String,Float> dico_rep = new HashMap<>();
 			ResultSet valPoss = st.executeQuery("Select valeur from VALPOSSIBLE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
@@ -291,68 +264,48 @@ public class AnalysteJDBC{
 		st = laConnexion.createStatement();
 		ResultSet rsBase = st.executeQuery("Select idT from TYPEQUESTION NATURAL JOIN QUESTION where numQ = " +questionAct.getNumQ());
 		rsBase.next();
+		List<String> listeCouleurs = new ArrayList<String>();
+		for (int j = 0; j < 10; j++){
+			listeCouleurs.add("#"+Integer.toHexString((int)(Math.random()*16777215)));
+		}
+		if (typeTri.equals("age")){
 		if (rsBase.getString(1).equals("u") ){
 			PieChart camembert = new PieChart();
 			//recuperer les reponses a la question actuelle
-			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur,idTr,valDebut,valFin from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idTr;");
+			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur,idTr,valDebut,valFin,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idTr order by REPONDRE.valeur;");
 			int i = -1;
-			List<String> listeCouleurs = new ArrayList<String>();
-			for (int j = 0; j < 10; j++){
-				listeCouleurs.add("#"+Integer.toHexString((int)(Math.random()*16777215)));
-			}
 			while (reponsesQ.next()){
-				if (i == -1){
-					i = reponsesQ.getInt(3);
+				if (i == -1 || i != reponsesQ.getInt(6)){
+					i = reponsesQ.getInt(6);
 				}
-				while (i != reponsesQ.getInt(3)){
-					PieChart.Data data = new PieChart.Data(reponsesQ.getInt(4)+"-"+reponsesQ.getInt(5)+ reponsesQ.getString(2), reponsesQ.getInt(1));
-					data.setName(reponsesQ.getInt(4)+"-"+reponsesQ.getInt(5)+ reponsesQ.getString(2) + " : " + data.getPieValue());
-					camembert.getData().add(data);
-					data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
-					i = reponsesQ.getInt(3);
-				}
+				//check if data already exists
+				PieChart.Data data = new PieChart.Data(reponsesQ.getInt(4)+"-"+reponsesQ.getInt(5)+ " " + reponsesQ.getString(2), reponsesQ.getInt(1));
+				data.setName(reponsesQ.getInt(4)+"-"+reponsesQ.getInt(5) +" " + reponsesQ.getString(2) + " : " + data.getPieValue());
+				camembert.getData().add(data);
+				data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
+				
 			}
+			//hide legend
+			camembert.setLegendVisible(false);
 			return camembert;
 		}
 		else if (rsBase.getString(1).equals("l") || rsBase.getString(1).equals("n")){
 			PieChart camembert = new PieChart();
 			//recuperer les reponses a la question actuelle
-			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur from REPONDRE  where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			int i = -1;
+			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur,idTr,valDebut,valFin from REPONDRE NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idTr order by REPONDRE.valeur;");
 			while (reponsesQ.next()){
-				PieChart.Data data = new PieChart.Data(reponsesQ.getString(2), reponsesQ.getInt(1));
-				data.setName(reponsesQ.getString(2) + " : " + data.getPieValue());
+				if (i == -1 || i != reponsesQ.getInt(2)){
+					i = reponsesQ.getInt(2);
+				}
+				PieChart.Data data = new PieChart.Data(reponsesQ.getString(4)+"-"+reponsesQ.getString(5) + " " + reponsesQ.getString(2), reponsesQ.getInt(1));
+				data.setName(reponsesQ.getString(4)+"-"+reponsesQ.getString(5) + " " + reponsesQ.getString(2) + " : " + data.getPieValue());
 				camembert.getData().add(data);
+				data.getNode().setStyle("-fx-pie-color: " + listeCouleurs.get(i%listeCouleurs.size()) + ";");
 			}
 			return camembert;
 		}
-		else if (rsBase.getString(1).equals("m")){
-			PieChart camembert = new PieChart();
-			HashMap<String,Integer> dico_rep = new HashMap<>();
-			
-				ResultSet reponsesQ = st.executeQuery("Select valeur from REPONDRE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ() + ";");
-				while(reponsesQ.next()){
-					String[] vals = reponsesQ.getString(1).split(";");
-					for(String item :vals){
-						ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + item);
-						rsval.next();
-						String val = rsval.getString(1);
-						if(!(dico_rep.containsKey(val))){
-							dico_rep.put(val, reponsesQ.getInt(1));
-						}
-						else{
-							dico_rep.put(val, dico_rep.get(val)+reponsesQ.getInt(1));
-						}
-					}
-				
-			}
-			for (String key : dico_rep.keySet()){
-				PieChart.Data slice = new PieChart.Data(key, dico_rep.get(key));
-				slice.setName(key+"->"+slice.getPieValue());
-				camembert.getData().add(slice);
-			}
-			return camembert;
-
-		}
+		
 		else if (rsBase.getString(1).equals("c")){
 			HashMap<String,Float> dico_rep = new HashMap<>();
 			ResultSet valPoss = st.executeQuery("Select valeur from VALPOSSIBLE where idQ = " + this.sondageAct.getId() + " and numQ = " + this.questionAct.getNumQ());
@@ -385,7 +338,7 @@ public class AnalysteJDBC{
 					camembert.getData().add(slice);
 				}
 				return camembert;
-		} 
+		} }
 		return null;
 	}
 	/**
@@ -477,36 +430,7 @@ public class AnalysteJDBC{
 			}
 			return battons;
 		}
-		else if (rsBase.getString(1).equals("m")){
-			ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
-			while(rs.next()){
-				String[] vals = rs.getString(2).split(";");
-				for(String item :vals){
-					ResultSet rsval = st.executeQuery("Select valeur from VALPOSSIBLE where idV = " + item);
-					rsval.next();
-					String val = rsval.getString(1);
-					if(!(dico_rep.containsKey(val))){
-						dico_rep.put(val, (float) rs.getInt(1));
-					}
-					else{
-						dico_rep.put(val, dico_rep.get(val)+(float)rs.getInt(1));
-					}
-				}
-			}
-			for (String key : dico_rep.keySet()){
-				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
-				series.setName(key);
-				series.getData().add(new XYChart.Data<String, Number>(key, dico_rep.get(key)));
-				battons.getData().add(series);
-			}
-			Collections.sort(battons.getData(), new Comparator<XYChart.Series<String, Number>>() {
-				@Override
-				public int compare(XYChart.Series<String, Number> o1, XYChart.Series<String, Number> o2) {
-					return o1.getData().get(0).getYValue().intValue() - o2.getData().get(0).getYValue().intValue();
-				}
-			});
-			return battons;
-		}
+		
 		return null;
 		
 	}
