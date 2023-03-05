@@ -53,7 +53,8 @@ insert into QUESTIONNAIRE(idQ, Titre, Etat, numC, idU, idPan) values
 (2,'Popularité des sportifs','C',15688,4,1),
 (3,'Ecoute des radios','C',15678,1,2),
 (4,'Les fast-foods','C',15678,7,1),
-(5,'Des gouts et des couleurs','S',15678,1,1);
+(5,'Des habits et des couleurs','A',15678,1,1);
+
 
 
 -- Les type de questions
@@ -71,11 +72,11 @@ insert into QUESTION(idQ,numQ,texteQ,MaxVal,idT) values
 (1,3,'Sur une échelle de 0 à 10 comment noteriez vous la couleur de la mairie?',10,'n'),
 (1,4,'Parmi ces couleurs classez en trois pour repeindre la façade de la mairie.',3,'c'),
 (1,5,'Quelle est votre couleur préférée?',NULL,'l'),
-(5,6,'De quelle couleur souhaiteriez vous peindre les lampadaires de la ville?',NULL,'u'),
-(5,7,'Sur une échelle de 0 à 10 comment noteriez vous la couleur des lampadaires de la ville?',10,'n'),
-(5,8,'Sur une échelle de 0 à 10 comment noteriez vous la couleur de la mairie?',10,'n'),
-(5,9,'Parmi ces couleurs classez en trois pour repeindre la façade de la mairie.',3,'c'),
-(5,10,'Quelle est votre couleur préférée?',NULL,'l');
+(5,1,'De quelle couleur est votre t shirt?',NULL,'u'),
+(5,2,'Sur une échelle de 0 à 10 comment noteriez vous la couleur de votre t shirt?',10,'n'),
+(5,3,'Sur une échelle de 0 à 10 comment noteriez vous la couleur de votre pantalon?',10,'n'),
+(5,4,'Parmi ces couleurs classez en trois pour repeindre votre pantalon.',3,'c'),
+(5,5,'Quelle est votre couleur préférée?',NULL,'l');
 
 -- les valeurs possibles pour les réponses à choix multiples ou classement  ou unique du questionnaires 1
 insert into VALPOSSIBLE(idQ, numQ, idV, Valeur) values
@@ -93,20 +94,20 @@ insert into VALPOSSIBLE(idQ, numQ, idV, Valeur) values
 (1,4,5,'Blanc'),
 (1,4,6,'Noir'),
 (1,4,7,'Cyan'),
-(5,6,1,'Bleu'),
-(5,6,2,'Vert'),
-(5,6,3,'Rouge'),
-(5,6,4,'Jaune'),
-(5,6,5,'Blanc'),
-(5,6,6,'Noir'),
-(5,6,7,'Cyan'),
-(5,9,1,'Bleu'),
-(5,9,2,'Vert'),
-(5,9,3,'Rouge'),
-(5,9,4,'Jaune'),
-(5,9,5,'Blanc'),
-(5,9,6,'Noir'),
-(5,9,7,'Cyan');
+(5,1,1,'Bleu'),
+(5,1,2,'Vert'),
+(5,1,3,'Rouge'),
+(5,1,4,'Jaune'),
+(5,1,5,'Blanc'),
+(5,1,6,'Noir'),
+(5,1,7,'Cyan'),
+(5,4,1,'Bleu'),
+(5,4,2,'Vert'),
+(5,4,3,'Rouge'),
+(5,4,4,'Jaune'),
+(5,4,5,'Blanc'),
+(5,4,6,'Noir'),
+(5,4,7,'Cyan');
 
 -- liste des caracteristiques
 insert into CARACTERISTIQUE(idC,sexe,idTr,idCat) values

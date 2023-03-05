@@ -203,7 +203,7 @@ public class AnalysteJDBC{
 		if (rsBase.getString(1).equals("u") ){
 			PieChart camembert = new PieChart();
 			//recuperer les reponses a la question actuelle
-			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.texteVal from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
 			while (reponsesQ.next()){
 				PieChart.Data data = new PieChart.Data(reponsesQ.getString(2), reponsesQ.getInt(1));
 				data.setName(reponsesQ.getString(2) + " : " + data.getPieValue());
@@ -271,7 +271,7 @@ public class AnalysteJDBC{
 		if (rsBase.getString(1).equals("u") ){
 			PieChart camembert = new PieChart();
 			//recuperer les reponses a la question actuelle
-			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur,idTr,valDebut,valFin,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idTr order by REPONDRE.valeur;");
+			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.texteVal,idTr,valDebut,valFin,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idTr order by REPONDRE.valeur;");
 			int i = -1;
 			while (reponsesQ.next()){
 				if (i == -1 || i != reponsesQ.getInt(6)){
@@ -397,7 +397,7 @@ public class AnalysteJDBC{
 			if (rsBase.getString(1).equals("u") ){
 				PieChart camembert = new PieChart();
 				//recuperer les reponses a la question actuelle
-				ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur,idCat,intituleCat,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN CATEGORIE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idCat order by REPONDRE.valeur;");
+				ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.texteVal,idCat,intituleCat,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN CATEGORIE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idCat order by REPONDRE.valeur;");
 				int i = -1;
 				while (reponsesQ.next()){
 					if (i == -1 || i != reponsesQ.getInt(5)){
@@ -574,7 +574,7 @@ public class AnalysteJDBC{
 				return battons;
 		}
 		else if (rsBase.getString(1).equals("u")){
-			ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.texteVal from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
 			while(rs.next()){
 				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
 				series.setName(rs.getString(2));
@@ -683,7 +683,7 @@ public class AnalysteJDBC{
 				return battons;
 		}
 		else if (rsBase.getString(1).equals("u")){
-			ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur,idTr,valDebut,valFin,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idTr order by REPONDRE.valeur;");
+			ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.texteVal,idTr,valDebut,valFin,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idTr order by REPONDRE.valeur;");
 			String val = "";
 			XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
 			while(rs.next()){
@@ -813,7 +813,7 @@ public class AnalysteJDBC{
 					return battons;
 			}
 			else if (rsBase.getString(1).equals("u")){
-				ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur,idCat,intituleCat,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN CATEGORIE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idCat order by REPONDRE.valeur;");
+				ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.texteVal,idCat,intituleCat,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN CATEGORIE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idCat order by REPONDRE.valeur;");
 				String val = "";
 				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
 				while(rs.next()){
