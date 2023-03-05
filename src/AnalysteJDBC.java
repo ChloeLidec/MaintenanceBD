@@ -204,7 +204,7 @@ public class AnalysteJDBC{
 		if (rsBase.getString(1).equals("u") ){
 			PieChart camembert = new PieChart();
 			//recuperer les reponses a la question actuelle
-			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			ResultSet reponsesQ = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
 			while (reponsesQ.next()){
 				PieChart.Data data = new PieChart.Data(reponsesQ.getString(2), reponsesQ.getInt(1));
 				data.setName(reponsesQ.getString(2) + " : " + data.getPieValue());
@@ -264,7 +264,6 @@ public class AnalysteJDBC{
 		st = laConnexion.createStatement();
 		ResultSet rsBase = st.executeQuery("Select idT from TYPEQUESTION NATURAL JOIN QUESTION where numQ = " +questionAct.getNumQ());
 		rsBase.next();
-		System.out.println();
 		List<String> listeCouleurs = new ArrayList<String>();
 		for (int j = 0; j < 10; j++){
 			listeCouleurs.add("#"+Integer.toHexString((int)(Math.random()*16777215)));
@@ -561,15 +560,20 @@ public class AnalysteJDBC{
 		}
 		else if (rsBase.getString(1).equals("u")){
 			ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , VALPOSSIBLE.valeur,idTr,valDebut,valFin,REPONDRE.valeur from REPONDRE JOIN VALPOSSIBLE ON REPONDRE.valeur=VALPOSSIBLE.idV NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idTr order by REPONDRE.valeur;");
+			String val = "";
+			XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
 			while(rs.next()){
-				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
-				series.setName(rs.getString(2));
-				String val = rs.getString(2);
-				while (rs.next() && rs.getString(2).equals(val)){
-					series.getData().add(new XYChart.Data<String, Number>(rs.getString(4) + "-" + rs.getString(5), rs.getInt(1)));
+				if (!val.equals(rs.getString(2))){
+					if (!val.equals("")){
+						battons.getData().add(series);
+					}
+					val = rs.getString(2);
+					series = new XYChart.Series<String, Number>();
+					series.setName(rs.getString(2));
 				}
-				battons.getData().add(series);
+					series.getData().add(new XYChart.Data<String, Number>(rs.getString(4) + "-" + rs.getString(5), rs.getInt(1)));				
 			}
+			battons.getData().add(series);
 			Collections.sort(battons.getData(), new Comparator<XYChart.Series<String, Number>>() {
 				@Override
 				public int compare(XYChart.Series<String, Number> o1, XYChart.Series<String, Number> o2) {
@@ -579,13 +583,35 @@ public class AnalysteJDBC{
 			return battons;
 		}
 		else if (rsBase.getString(1).equals("n") || rsBase.getString(1).equals("l")){
-			ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur from REPONDRE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur;");
+			ResultSet rs = st.executeQuery("Select count(REPONDRE.valeur) , REPONDRE.valeur,idTr,valDebut,valFin from REPONDRE NATURAL JOIN CARACTERISTIQUE NATURAL JOIN TRANCHE where REPONDRE.idQ = " + this.sondageAct.getId() + " and REPONDRE.numQ = " + this.questionAct.getNumQ() + " group by REPONDRE.valeur,idTr order by REPONDRE.valeur;");
+			String val = "";
+			XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
 			while(rs.next()){
-				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
-				series.setName(rs.getString(2));
-				series.getData().add(new XYChart.Data<String, Number>(rs.getString(2), rs.getInt(1)));
-				battons.getData().add(series);
+				if (rsBase.getString(1).equals("l")){
+					if (!val.equals(rs.getString(2))){
+						if (!val.equals("")){
+							battons.getData().add(series);
+						}
+						val = rs.getString(2);
+						series = new XYChart.Series<String, Number>();
+						series.setName(rs.getString(2));
+					}
+						series.getData().add(new XYChart.Data<String, Number>(rs.getString(4) + "-" + rs.getString(5), rs.getInt(1)));
+				}
+				else if (rsBase.getString(1).equals("n")){
+					if (!val.equals(rs.getInt(2)+"")){
+						if (!val.equals("")){
+							battons.getData().add(series);
+						}
+						val = rs.getInt(2) + "";
+						series = new XYChart.Series<String, Number>();
+						series.setName(rs.getInt(2)+"");
+					}
+						series.getData().add(new XYChart.Data<String, Number>(rs.getString(4) + "-" + rs.getString(5), rs.getInt(1)));
+				}
+				
 			}
+			battons.getData().add(series);
 			if (rsBase.getString(1).equals("n")){
 				Collections.sort(battons.getData(), new Comparator<XYChart.Series<String, Number>>() {
 					@Override
