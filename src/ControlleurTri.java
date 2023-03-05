@@ -12,6 +12,10 @@ public class ControlleurTri implements EventHandler<ActionEvent>{
     @Override
     public void handle(ActionEvent actionEvent) {
         String chart = this.vue.typeGraphe;
-        this.vue.changerGrapheTri(chart,this.type);
+        if (type == null){
+            this.vue.changerGraphe(chart);
+        }
+        else{
+        this.vue.changerGrapheTri(chart,this.type);}
     }
 }

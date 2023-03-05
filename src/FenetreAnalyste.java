@@ -149,20 +149,26 @@ public class FenetreAnalyste extends BorderPane {
             tTriParAge.setFont(Font.font("verdana", null, FontPosture.REGULAR, 15));
             Text tTriSocio = new Text("Tri par catégorie \n      socio-pro");
             tTriSocio.setFont(Font.font("verdana", null, FontPosture.REGULAR, 13));
+            Text reinit = new Text("Réinitialiser le tri");
+            reinit.setFont(Font.font("verdana", null, FontPosture.REGULAR, 15));
             Button aller = new Button("",tAller);
             aller.setOnAction(new ControlleurAllerQ(app,this.ana,numAllerA));
             Button triParAge = new Button("",tTriParAge);
             triParAge.setOnAction(new ControlleurTri(this,"Age"));
             Button triSocio = new Button("",tTriSocio);
             triSocio.setOnAction(new ControlleurTri(this,"Socio"));
+            Button reinitialiser = new Button("",reinit);
+            reinitialiser.setOnAction(new ControlleurTri(this,null));
             aller.setPrefSize(140,40);
             triParAge.setPrefSize(140,40);
             triSocio.setPrefSize(140,40);
+            reinitialiser.setPrefSize(140,40);
             allerAQ.getChildren().addAll(numAllerA,aller);
             aller.setStyle("-fx-font: 22 arial; -fx-base: #5ce1e6;-fx-background-radius: 10px;");
             triParAge.setStyle("-fx-font: 22 arial; -fx-base: #5ce1e6;-fx-background-radius: 10px;");
             triSocio.setStyle("-fx-font: 22 arial; -fx-base: #5ce1e6;-fx-background-radius: 10px;");
-            left.getChildren().addAll(sondage,allerA,allerAQ,triParAge,triSocio);
+            reinitialiser.setStyle("-fx-font: 22 arial; -fx-base: #5ce1e6;-fx-background-radius: 10px;");
+            left.getChildren().addAll(sondage,allerA,allerAQ,triParAge,triSocio,reinitialiser);
             left.setAlignment(Pos.CENTER);
             lefty.setAlignment(Pos.CENTER);
             left.setSpacing(30);
@@ -268,7 +274,6 @@ public class FenetreAnalyste extends BorderPane {
             Text ques =new Text(this.ana.gQuestion().getTexte());
             ques.setWrappingWidth(800);
             center.getChildren().addAll(new Text("Question "+this.ana.gQuestion().getNumQ()),ques);
-
             if (type == "Pie") {
                 PieChart pie = null;
                 try {
