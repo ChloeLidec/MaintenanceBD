@@ -3,14 +3,12 @@ import javafx.event.EventHandler;
 //controleur question precedente
 public class ControleurBoutonPrec implements EventHandler<ActionEvent>{
     private AppliAllo45 app;
-    private SondeurJDBC mod;
-    private AnalysteJDBC moda;
+    private AnalysteDAO moda;
 
 
 
-    public ControleurBoutonPrec(AppliAllo45 app,SondeurJDBC mod,AnalysteJDBC modana){
+    public ControleurBoutonPrec(AppliAllo45 app,AnalysteDAO modana){
         this.app=app;
-        this.mod=mod;
         this.moda=modana;
     }
 
@@ -18,9 +16,6 @@ public class ControleurBoutonPrec implements EventHandler<ActionEvent>{
     public void handle(ActionEvent actionEvent) {
         if (this.moda!=null){
             this.moda.questionPrec();
-        }
-        else if(this.mod !=null){
-            this.mod.questionPrec();
         }
         try {
             this.app.majAffichage();

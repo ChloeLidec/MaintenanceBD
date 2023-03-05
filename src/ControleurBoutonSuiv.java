@@ -4,14 +4,12 @@ import javafx.event.EventHandler;
 //controleur bouton suivant
 public class ControleurBoutonSuiv implements EventHandler<ActionEvent>{
     private AppliAllo45 app;
-    private SondeurJDBC mod;
-    private AnalysteJDBC moda;
+    private AnalysteDAO moda;
 
 
 
-    public ControleurBoutonSuiv(AppliAllo45 app,SondeurJDBC mod,AnalysteJDBC modana){
+    public ControleurBoutonSuiv(AppliAllo45 app,AnalysteDAO modana){
         this.app=app;
-        this.mod=mod;
         this.moda=modana;
     }
 
@@ -28,17 +26,7 @@ public class ControleurBoutonSuiv implements EventHandler<ActionEvent>{
                 this.moda.setReponses(this.moda.gQuestion(), this.moda.getSondage());
             } catch (Exception e) {
                 System.err.println(e.getMessage());
-            }}
-            
-        else if(this.mod !=null){
-                try {
-                    this.mod.enregistrerReponse();
-                } catch (Exception e) {
-                    System.err.println(e.getMessage());
-                }
-                this.mod.questionSuiv();
-            }
-            
+            }}            
         
         try {
             this.app.majAffichage();

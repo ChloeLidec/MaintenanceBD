@@ -21,10 +21,10 @@ public class FenetreFinAnalyste  extends BorderPane {
     private Label nomEnt ;
     private Label textent1 ;
     private Label textent2 ;
-    private AnalysteJDBC ana;
+    private AnalysteDAO ana;
     private Button ba;
 
-    public FenetreFinAnalyste(AnalysteJDBC ana,Button ba){
+    public FenetreFinAnalyste(AnalysteDAO ana,Button ba){
         super();
         this.ana=ana;
         this.ba=ba;
