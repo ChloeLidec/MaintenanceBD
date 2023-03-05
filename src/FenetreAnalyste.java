@@ -33,10 +33,10 @@ public class FenetreAnalyste extends BorderPane {
     private Button bprec;
     private Button decoB;
     private Button acceuil;
-    private AnalysteJDBC ana;
+    private AnalysteDAO ana;
     private AppliAllo45 app;
     public String typeGraphe;
-        public FenetreAnalyste(Button prec,Button suiv,Button ac,Button decoB,AnalysteJDBC ana,AppliAllo45 app){
+        public FenetreAnalyste(Button prec,Button suiv,Button ac,Button decoB,AnalysteDAO ana,AppliAllo45 app){
             super();
             this.bsuiv=suiv;
             this.bprec=prec;
@@ -153,7 +153,7 @@ public class FenetreAnalyste extends BorderPane {
             Text tTriSocio = new Text("Tri par catégorie \n      socio-pro");
             tTriSocio.setFont(Font.font("verdana", null, FontPosture.REGULAR, 13));
             Button aller = new Button("",tAller);
-            aller.setOnAction(new ControlleurAllerQ(app,null,this.ana,numAllerA));
+            aller.setOnAction(new ControlleurAllerQ(app,this.ana,numAllerA));
             Button triParAge = new Button("",tTriParAge);
             triParAge.setOnAction(new ControlleurTri(this,"Age"));
             Button triSocio = new Button("",tTriSocio);

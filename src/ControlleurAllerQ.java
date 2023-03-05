@@ -3,14 +3,12 @@ import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
 public class ControlleurAllerQ implements EventHandler<ActionEvent>{
     private AppliAllo45 app;
-    private SondeurJDBC mod;
-    private AnalysteJDBC moda;
+    private AnalysteDAO moda;
     private TextField tfnumQ;
 
 
-    public ControlleurAllerQ(AppliAllo45 app,SondeurJDBC mod,AnalysteJDBC modana,TextField tfnumQ){
+    public ControlleurAllerQ(AppliAllo45 app,AnalysteDAO modana,TextField tfnumQ){
         this.app=app;
-        this.mod=mod;
         this.moda=modana;
         this.tfnumQ = tfnumQ;
     }

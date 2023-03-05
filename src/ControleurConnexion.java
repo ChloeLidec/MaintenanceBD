@@ -27,11 +27,7 @@ public class ControleurConnexion implements EventHandler<ActionEvent>{
 	    if (this.conn.isConnecte()){
             Utilisateur u =this.mod.getUtilisateur(this.fenlog.getID(), this.fenlog.getMdp());
             //recup l utilisateur
-            if (u.getRole().equals("Sondeur")){
-                this.app.setUtilisateur(u);
-                this.app.modesondeur();
-            }
-            else if(u.getRole().equals("Analyste")){
+            if(u.getRole().equals("Analyste")){
                 this.app.setUtilisateur(u);
                 this.app.modeAcAnalyste();
             }
@@ -41,7 +37,7 @@ public class ControleurConnexion implements EventHandler<ActionEvent>{
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
 			alert.setTitle("Echec !!!! ");
 			alert.setResizable(true);
-			alert.setWidth(500);
+			alert.setHeight(500);
 			alert.setHeaderText("Echec de la connexion au serveur");
 			alert.setContentText("Voici le message envoyé par le serveur\n"+e.getMessage());
 			alert.showAndWait();
@@ -50,7 +46,7 @@ public class ControleurConnexion implements EventHandler<ActionEvent>{
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
 			alert.setTitle("Echec !!!! ");
 			alert.setResizable(true);
-			alert.setWidth(500);
+			alert.setHeight(500);
 			alert.setHeaderText("Problème SQL");
 			alert.setContentText("Voici le message envoyé par le serveur\n"+e.getMessage());
 			alert.showAndWait();

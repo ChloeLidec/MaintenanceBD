@@ -14,7 +14,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 
 
-public class AnalysteJDBC{
+public class AnalysteDAO{
 	/**la question actuelle */
 	private Question questionAct;
 	/**le sondage actuel */
@@ -31,7 +31,7 @@ public class AnalysteJDBC{
 	 * @param question
 	 * @param sondageAct
 	 */
-	public AnalysteJDBC(ConnexionMySQL laConnexion, Question question, Sondage sondageAct){
+	public AnalysteDAO(ConnexionMySQL laConnexion, Question question, Sondage sondageAct){
 		this.laConnexion=laConnexion;
 		this.questionAct = question;
 		this.sondageAct = sondageAct;

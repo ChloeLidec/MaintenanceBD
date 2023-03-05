@@ -18,7 +18,7 @@ public class AppliAllo45 extends Application {
     /**vue connexion */
     private Login fenLog;
     /**modele analyste */
-    private AnalysteJDBC modAna;
+    private AnalysteDAO modAna;
     /**modele sondeur */
     private SondeurJDBC modSond;
     /**modele general */
@@ -148,7 +148,7 @@ public class AppliAllo45 extends Application {
     public void modeAcAnalyste() throws SQLException, ParseException{
         List<Sondage> s =this.modGen.getSondageAnalyste();
         this.setSondages(s);
-        this.modAna= new AnalysteJDBC(this.conn, this.sondages.get(0).getQuestions().get(0),this.sondages.get(0));
+        this.modAna= new AnalysteDAO(this.conn, this.sondages.get(0).getQuestions().get(0),this.sondages.get(0));
         Button decoB = new Button("Déconnexion");
         decoB.setOnAction(new ControleurDeconnexion(this, this.conn));
         this.fenAcAna= new FenetreAccueilAnalyste(decoB,this.modGen,this,this.modAna);
@@ -169,11 +169,11 @@ public class AppliAllo45 extends Application {
                 sondage=s;
             }
         }
-        this.modAna= new AnalysteJDBC(this.conn,sondage.getQuestion(0) ,sondage);
+        this.modAna= new AnalysteDAO(this.conn,sondage.getQuestion(0) ,sondage);
         Button btnPrec = new Button();
-        btnPrec.setOnAction(new ControleurBoutonPrec(this, this.modSond, this.modAna));
+        btnPrec.setOnAction(new ControleurBoutonPrec(this, this.modAna));
         Button btnSuiv = new Button();
-        btnSuiv.setOnAction(new ControleurBoutonSuiv(this, this.modSond, this.modAna));
+        btnSuiv.setOnAction(new ControleurBoutonSuiv(this, this.modAna));
         Button decoB = new Button("Déconnexion");
         decoB.setOnAction(new ControleurDeconnexion(this, this.conn));
         Button accueil = new Button("Accueil");

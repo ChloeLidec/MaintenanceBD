@@ -17,7 +17,7 @@ public class FenetreAccueilAnalyste extends BorderPane{
     protected Button deconnexion;
     private GeneralJDBC gene;
     private AppliAllo45 app;
-    private AnalysteJDBC ana;
+    private AnalysteDAO ana;
 
     /**
      * constructeur
@@ -28,7 +28,7 @@ public class FenetreAccueilAnalyste extends BorderPane{
      * @throws SQLException
      * @throws ParseException
      */
-    public FenetreAccueilAnalyste(Button b,GeneralJDBC gen,AppliAllo45 app,AnalysteJDBC ana) throws SQLException, ParseException{
+    public FenetreAccueilAnalyste(Button b,GeneralJDBC gen,AppliAllo45 app,AnalysteDAO ana) throws SQLException, ParseException{
         super();
         this.gene=gen;
         this.app=app;
